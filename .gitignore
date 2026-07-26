@@ -1,0 +1,24 @@
+# dependências
+/node_modules
+
+# build
+/.next/
+/out/
+/build
+
+# variáveis de ambiente (nunca sobe isso pro github)
+.env*.local
+.env
+
+# sistema
+.DS_Store
+*.pem
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
