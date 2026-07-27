@@ -594,3 +594,39 @@
     padding: 20px;
   }
 }
+
+/* Insights financeiros da Soraia */
+
+.real-insight-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.real-insight-list .real-insight {
+  align-items: flex-start;
+}
+
+.real-insight-list .real-insight > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.real-insight-list .real-insight strong {
+  font-size: 0.9rem;
+}
+
+.real-insight-list .real-insight p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.real-insight-alerta svg {
+  flex-shrink: 0;
+}
+
+.real-insight-positivo svg,
+.real-insight-informativo svg {
+  flex-shrink: 0;
+}

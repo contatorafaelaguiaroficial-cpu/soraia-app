@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import DashboardHomeReal from "@/components/dashboard/home/DashboardHomeReal";
+import { gerarInsights } from "@/lib/soraia/insights";
+import type { Transaction } from "@/lib/soraia/types";
 
 type Movimentacao = {
   id: string;
@@ -59,6 +61,20 @@ export default async function PainelPage() {
   }
 
   const movimentacoes = (data || []) as Movimentacao[];
+
+  const transacoesParaInsights: Transaction[] =
+    movimentacoes.map((item) => ({
+      tipo: item.tipo,
+      descricao: item.descricao,
+      valor: Number(item.valor),
+      categoria: item.categoria || null,
+      data: item.data,
+      status: item.status,
+    }));
+
+  const insights = gerarInsights(
+    transacoesParaInsights,
+  ).slice(0, 3);
 
   const efetivadas = movimentacoes.filter(
     (item) =>
@@ -144,6 +160,7 @@ export default async function PainelPage() {
       totalVencido={totalVencido}
       proximoCompromisso={proximoCompromisso}
       proximosCompromissos={proximosCompromissos}
+      insights={insights}
     />
   );
 }

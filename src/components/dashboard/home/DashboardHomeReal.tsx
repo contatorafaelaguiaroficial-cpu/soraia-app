@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Insight } from "@/lib/soraia/insights";
 import {
   AlertTriangle,
   ArrowDownCircle,
@@ -37,6 +38,7 @@ type Props = {
   totalVencido: number;
   proximoCompromisso: Compromisso | null;
   proximosCompromissos: Compromisso[];
+  insights: Insight[];
 };
 
 function moeda(valor: number) {
@@ -309,14 +311,35 @@ export default function DashboardHomeReal(props: Props) {
             <Sparkles size={22} />
           </div>
 
-          <div className="real-insight">
-            {props.quantidadeVencidos > 0 ? (
-              <AlertTriangle size={25} />
-            ) : (
-              <Sparkles size={25} />
-            )}
+          <div className="real-insight-list">
+            {props.insights.length > 0 ? (
+              props.insights.map((insight) => (
+                <div
+                  className={`real-insight real-insight-${insight.tipo}`}
+                  key={insight.id}
+                >
+                  {insight.tipo === "alerta" ? (
+                    <AlertTriangle size={22} />
+                  ) : (
+                    <Sparkles size={22} />
+                  )}
 
-            <p>{mensagem}</p>
+                  <div>
+                    <strong>{insight.titulo}</strong>
+                    <p>{insight.mensagem}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="real-insight">
+                <Sparkles size={22} />
+
+                <div>
+                  <strong>Análise financeira</strong>
+                  <p>{mensagem}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           <Link
