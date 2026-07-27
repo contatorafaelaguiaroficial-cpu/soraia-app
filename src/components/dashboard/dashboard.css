@@ -1035,3 +1035,277 @@ button, input { font: inherit; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+
+/* =========================================================
+   CORREÇÃO MOBILE — SORAIA
+   ========================================================= */
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 900px) {
+  /*
+   * Esconde completamente a navegação lateral do desktop.
+   */
+  .dashboard-sidebar,
+  .sidebar,
+  .sidebar-container,
+  .dashboard-shell > aside,
+  aside.dashboard-sidebar {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    transform: translateX(-120%) !important;
+  }
+
+  /*
+   * Remove o espaço reservado para a sidebar.
+   */
+  .dashboard-shell,
+  .dashboard-layout,
+  .dashboard-container {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .dashboard-main,
+  .dashboard-content,
+  .dashboard-page,
+  main {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  /*
+   * Área principal com espaço para a navegação inferior.
+   */
+  .dashboard-content,
+  .dashboard-page,
+  .dashboard-main > main {
+    padding-bottom: calc(110px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /*
+   * Navegação inferior mobile.
+   */
+  .mobile-navigation,
+  .mobile-nav,
+  .bottom-navigation {
+    display: flex !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    z-index: 1000 !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+  }
+
+  /*
+   * Campo flutuante do assistente acima da barra inferior.
+   */
+  .assistant-dock,
+  .dashboard-assistant-dock {
+    position: fixed !important;
+    left: 16px !important;
+    right: 16px !important;
+    bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    z-index: 900 !important;
+  }
+
+  /*
+   * Esconde perfil da sidebar e botão de recolher.
+   */
+  .sidebar-user-card,
+  .sidebar-collapse-button,
+  .sidebar-toggle,
+  .sidebar-handle {
+    display: none !important;
+  }
+
+  /*
+   * Evita elementos maiores que a tela.
+   */
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-content,
+  .dashboard-page,
+  .dashboard-main > main {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .dashboard-grid,
+  .summary-grid,
+  .cards-grid,
+  .metrics-grid,
+  .home-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .dashboard-card,
+  .summary-card,
+  .metric-card {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+/*
+ * Mantém a navegação mobile escondida no desktop.
+ */
+@media (min-width: 901px) {
+  .mobile-navigation,
+  .mobile-nav,
+  .bottom-navigation {
+    display: none !important;
+  }
+}
+
+/* CORREÇÃO DEFINITIVA — REMOVE SIDEBAR DESKTOP NO MOBILE */
+@media (max-width: 900px) {
+  .soraia-sidebar,
+  aside.soraia-sidebar,
+  .soraia-sidebar__toggle {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .soraia-dashboard,
+  .soraia-dashboard.soraia-dashboard--collapsed {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+  }
+
+  .soraia-dashboard__main {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+}
+
+/* =========================================================
+   MOBILE DEFINITIVO
+   Remove completamente a sidebar e qualquer espaço dela.
+   ========================================================= */
+
+@media (max-width: 900px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .soraia-dashboard,
+  .soraia-dashboard--mobile,
+  .soraia-dashboard--collapsed {
+    display: block !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100dvh !important;
+  }
+
+  .soraia-sidebar,
+  aside.soraia-sidebar,
+  .soraia-sidebar__toggle {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .soraia-dashboard__main {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 18px 16px 160px !important;
+  }
+
+  .soraia-topbar {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 22px !important;
+    z-index: auto !important;
+  }
+
+  .soraia-dock,
+  .soraia-dock--collapsed {
+    position: fixed !important;
+    left: 16px !important;
+    right: 16px !important;
+    bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    z-index: 40 !important;
+  }
+
+  .soraia-mobile-nav {
+    display: grid !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    z-index: 50 !important;
+  }
+}
+
+@media (min-width: 901px) {
+  .soraia-mobile-nav {
+    display: none !important;
+  }
+}
