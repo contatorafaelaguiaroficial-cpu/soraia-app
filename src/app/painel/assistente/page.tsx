@@ -1,11 +1,6 @@
-import EmptyStatePage from "@/components/dashboard/EmptyStatePage";
+import AssistenteFinanceiro from "@/components/assistente/AssistenteFinanceiro";
+import "./assistente.css";
 
-export default function Page() {
-  return (
-    <EmptyStatePage
-      eyebrow="Assistente"
-      title="Converse com a Soraia"
-      description="Peça análises, organize decisões e entenda sua vida financeira em linguagem simples."
-    />
-  );
+export default function AssistentePage() {
+  return <AssistenteFinanceiro />;
 }

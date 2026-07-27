@@ -1,0 +1,596 @@
+.real-dashboard {
+  min-height: 100%;
+  padding: 34px 38px 120px;
+  color: #f7f3fb;
+}
+
+.real-dashboard-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 34px;
+  min-height: 430px;
+  overflow: hidden;
+  padding: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  background:
+    radial-gradient(
+      circle at 82% 40%,
+      rgba(139, 92, 246, 0.17),
+      transparent 28%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.025),
+      rgba(255, 255, 255, 0.005)
+    ),
+    #15111b;
+}
+
+.real-dashboard-hero::before {
+  position: absolute;
+  top: -120px;
+  left: 42%;
+  width: 220px;
+  height: 700px;
+  transform: rotate(19deg);
+  background: rgba(255, 255, 255, 0.018);
+  content: "";
+}
+
+.real-dashboard-hero-content {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+}
+
+.real-dashboard-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 20px;
+  color: #b897ff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.real-dashboard-hero h1 {
+  max-width: 760px;
+  margin: 0;
+  font-size: clamp(42px, 5.5vw, 76px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+}
+
+.real-dashboard-hero h1 strong {
+  color: #b89aff;
+  font-weight: 800;
+}
+
+.real-dashboard-hero p {
+  max-width: 680px;
+  margin: 28px 0 0;
+  color: #9c93a6;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.real-dashboard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.real-dashboard-primary,
+.real-dashboard-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 50px;
+  padding: 0 20px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.real-dashboard-primary {
+  background: linear-gradient(135deg, #9c73ff, #7040e8);
+  box-shadow: 0 14px 32px rgba(112, 64, 232, 0.25);
+  color: #fff;
+}
+
+.real-dashboard-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.025);
+  color: #b8afc0;
+}
+
+.real-balance-orbit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 330px;
+}
+
+.real-balance-orbit::before,
+.real-balance-orbit::after {
+  position: absolute;
+  border: 1px solid rgba(172, 137, 255, 0.13);
+  border-radius: 50%;
+  content: "";
+}
+
+.real-balance-orbit::before {
+  width: 310px;
+  height: 310px;
+}
+
+.real-balance-orbit::after {
+  width: 380px;
+  height: 380px;
+  border-style: dashed;
+  opacity: 0.55;
+}
+
+.real-balance-circle {
+  position: relative;
+  z-index: 2;
+  width: 245px;
+  height: 245px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid rgba(172, 137, 255, 0.22);
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(139, 92, 246, 0.11),
+      transparent 68%
+    ),
+    #17131e;
+  box-shadow:
+    0 0 70px rgba(139, 92, 246, 0.08),
+    inset 0 0 40px rgba(139, 92, 246, 0.05);
+}
+
+.real-balance-circle span,
+.real-balance-circle small {
+  color: #8f8599;
+}
+
+.real-balance-circle span {
+  margin-bottom: 12px;
+  font-size: 11px;
+}
+
+.real-balance-circle strong {
+  font-size: 31px;
+  letter-spacing: -0.04em;
+}
+
+.real-balance-circle small {
+  margin-top: 10px;
+  font-size: 9px;
+}
+
+.real-orbit-badge {
+  position: absolute;
+  z-index: 3;
+  min-width: 130px;
+  padding: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(18, 14, 23, 0.92);
+  backdrop-filter: blur(18px);
+}
+
+.real-orbit-badge span,
+.real-orbit-badge strong {
+  display: block;
+}
+
+.real-orbit-badge span {
+  margin-bottom: 4px;
+  color: #847a8e;
+  font-size: 9px;
+}
+
+.real-orbit-badge strong {
+  font-size: 13px;
+}
+
+.real-orbit-top {
+  top: 18px;
+  right: 0;
+}
+
+.real-orbit-bottom {
+  bottom: 18px;
+  left: 0;
+}
+
+.real-dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.real-dashboard-metrics article {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 19px;
+  background: #15111b;
+}
+
+.real-metric-icon,
+.real-next-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+}
+
+.real-metric-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+}
+
+.real-dashboard-metrics span,
+.real-dashboard-metrics strong {
+  display: block;
+}
+
+.real-dashboard-metrics span {
+  margin-bottom: 6px;
+  color: #8c8296;
+  font-size: 10px;
+}
+
+.real-dashboard-metrics strong {
+  font-size: 18px;
+}
+
+.real-purple {
+  background: rgba(139, 92, 246, 0.13);
+  color: #b595ff;
+}
+
+.real-green {
+  background: rgba(75, 211, 145, 0.1);
+  color: #56d49a;
+}
+
+.real-red {
+  background: rgba(255, 106, 126, 0.1);
+  color: #ff8191;
+}
+
+.real-orange {
+  background: rgba(245, 174, 68, 0.1);
+  color: #f5ae44;
+}
+
+.real-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.real-dashboard-card {
+  min-width: 0;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 23px;
+  background: #15111b;
+}
+
+.real-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.real-card-header span {
+  display: block;
+  margin-bottom: 7px;
+  color: #aa87ff;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.real-card-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.real-card-header > svg {
+  color: #a782ff;
+}
+
+.real-forecast-card {
+  background:
+    radial-gradient(
+      circle at 85% 10%,
+      rgba(139, 92, 246, 0.12),
+      transparent 34%
+    ),
+    #15111b;
+}
+
+.real-forecast-value {
+  margin-bottom: 25px;
+}
+
+.real-forecast-value span,
+.real-forecast-value strong {
+  display: block;
+}
+
+.real-forecast-value span {
+  margin-bottom: 8px;
+  color: #8b8195;
+  font-size: 11px;
+}
+
+.real-forecast-value strong {
+  font-size: clamp(31px, 4vw, 48px);
+  letter-spacing: -0.05em;
+}
+
+.real-forecast-value strong.is-negative {
+  color: #ff8191;
+}
+
+.real-forecast-lines {
+  display: flex;
+  flex-direction: column;
+}
+
+.real-forecast-lines > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.real-forecast-lines span {
+  color: #8b8195;
+  font-size: 11px;
+}
+
+.real-forecast-lines strong {
+  font-size: 12px;
+}
+
+.real-positive {
+  color: #56d49a;
+}
+
+.real-negative {
+  color: #ff8191;
+}
+
+.real-next-commitment {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 17px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 17px;
+  background: #1a151f;
+}
+
+.real-next-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+}
+
+.real-next-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.real-next-content strong,
+.real-next-content span {
+  display: block;
+}
+
+.real-next-content strong {
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.real-next-content span {
+  overflow: hidden;
+  color: #81778b;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.real-next-commitment > strong {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.real-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 22px;
+  color: #af8cff;
+  font-size: 11px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.real-insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid rgba(139, 92, 246, 0.13);
+  border-radius: 17px;
+  background: rgba(139, 92, 246, 0.055);
+}
+
+.real-insight svg {
+  flex: 0 0 auto;
+  color: #b595ff;
+}
+
+.real-insight p {
+  margin: 0;
+  color: #b6adbf;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.real-commitment-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.real-commitment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.real-commitment-row:first-child {
+  border-top: 0;
+}
+
+.real-commitment-row div {
+  min-width: 0;
+}
+
+.real-commitment-row div strong,
+.real-commitment-row div span {
+  display: block;
+}
+
+.real-commitment-row div strong {
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.real-commitment-row div span {
+  color: #81778b;
+  font-size: 9px;
+}
+
+.real-commitment-row > strong {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.real-empty-state {
+  display: flex;
+  min-height: 125px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  color: #847a8d;
+}
+
+.real-empty-state svg {
+  margin-bottom: 12px;
+  color: #9e7bf5;
+}
+
+.real-empty-state strong {
+  margin-bottom: 6px;
+  color: #eee8f3;
+  font-size: 13px;
+}
+
+.real-empty-state span {
+  font-size: 10px;
+}
+
+@media (max-width: 1150px) {
+  .real-dashboard-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .real-balance-orbit {
+    min-height: 390px;
+  }
+
+  .real-dashboard-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 850px) {
+  .real-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .real-dashboard {
+    padding: 20px 16px 110px;
+  }
+
+  .real-dashboard-hero {
+    min-height: auto;
+    padding: 28px 22px;
+  }
+
+  .real-dashboard-hero h1 {
+    font-size: 44px;
+  }
+
+  .real-dashboard-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .real-balance-orbit {
+    min-height: 330px;
+  }
+
+  .real-balance-orbit::after {
+    width: 315px;
+    height: 315px;
+  }
+
+  .real-balance-orbit::before {
+    width: 275px;
+    height: 275px;
+  }
+
+  .real-balance-circle {
+    width: 215px;
+    height: 215px;
+  }
+
+  .real-dashboard-card {
+    padding: 20px;
+  }
+}
