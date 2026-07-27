@@ -27,7 +27,7 @@ export default async function MetaDetalhePage({ params }: { params: Promise<{ id
 
   const { data: meta } = await supabase
     .from("metas")
-    .select("id, nome, valor_atual, valor_meta")
+    .select("id, nome, valor_atual, valor_meta, prazo")
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
@@ -43,7 +43,35 @@ export default async function MetaDetalhePage({ params }: { params: Promise<{ id
     .order("created_at", { ascending: false });
 
   const listaAportes = (aportes ?? []) as Aporte[];
-  const pct = meta.valor_meta > 0 ? Math.round((meta.valor_atual / meta.valor_meta) * 100) : 0;
+  const pct = meta.valor_meta > 0
+    ? Math.round(
+        (meta.valor_atual / meta.valor_meta) * 100,
+      )
+    : 0;
+
+  const valorRestante = Math.max(
+    Number(meta.valor_meta) - Number(meta.valor_atual),
+    0,
+  );
+
+  let mesesRestantes = 0;
+
+  if (meta.prazo) {
+    const hoje = new Date();
+    const prazo = new Date(`${meta.prazo}T00:00:00`);
+
+    mesesRestantes = Math.max(
+      1,
+      (prazo.getFullYear() - hoje.getFullYear()) * 12 +
+        prazo.getMonth() -
+        hoje.getMonth(),
+    );
+  }
+
+  const aporteMensal =
+    meta.prazo && valorRestante > 0
+      ? valorRestante / mesesRestantes
+      : 0;
 
   return (
     <div className="min-h-screen" style={{ background: "#0F0C14", fontFamily: "'Nunito', sans-serif" }}>
@@ -94,10 +122,68 @@ export default async function MetaDetalhePage({ params }: { params: Promise<{ id
           </div>
         </div>
 
+        {meta.prazo && (
+          <div
+            className="rounded-[22px] p-5 mb-5"
+            style={{
+              background: "rgba(139,92,246,0.08)",
+              border:
+                "1px solid rgba(139,92,246,0.18)",
+            }}
+          >
+            <span
+              style={{
+                display: "block",
+                marginBottom: 7,
+                color: "#9C93AC",
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+            >
+              Plano para alcançar a meta
+            </span>
+
+            <strong
+              style={{
+                display: "block",
+                color: "#F4F1F8",
+                fontSize: 18,
+              }}
+            >
+              {valorRestante === 0
+                ? "Meta concluída"
+                : `${aporteMensal.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })} por mês`}
+            </strong>
+
+            <span
+              style={{
+                display: "block",
+                marginTop: 7,
+                color: "#9C93AC",
+                fontSize: 12,
+              }}
+            >
+              Prazo:{" "}
+              {new Intl.DateTimeFormat("pt-BR", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+                timeZone: "UTC",
+              }).format(
+                new Date(`${meta.prazo}T00:00:00Z`),
+              )}
+            </span>
+          </div>
+        )}
+
         <MetaActions
           metaId={meta.id}
           nomeAtual={meta.nome}
           valorAtual={Number(meta.valor_meta)}
+          prazoAtual={meta.prazo}
         />
 
         <NovoAporteForm metaId={meta.id} />

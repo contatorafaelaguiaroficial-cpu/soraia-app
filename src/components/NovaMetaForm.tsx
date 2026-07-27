@@ -53,8 +53,32 @@ export default function NovaMetaForm() {
           min="1"
           placeholder="Valor da meta (R$)"
           required
-          className="w-full mb-4 rounded-xl px-4 py-3 text-sm outline-none"
+          className="w-full mb-3 rounded-xl px-4 py-3 text-sm outline-none"
           style={{ background: "#241E2D", color: INK, border: `1px solid ${CARD_BORDER}` }}
+        />
+
+        <label
+          className="block mb-2"
+          style={{
+            color: MUTED,
+            fontSize: 12,
+            fontWeight: 700,
+          }}
+        >
+          Prazo para alcançar a meta
+        </label>
+
+        <input
+          name="prazo"
+          type="date"
+          min={new Date().toISOString().split("T")[0]}
+          className="w-full mb-4 rounded-xl px-4 py-3 text-sm outline-none"
+          style={{
+            background: "#241E2D",
+            color: INK,
+            border: `1px solid ${CARD_BORDER}`,
+            colorScheme: "dark",
+          }}
         />
         <button
           type="submit"

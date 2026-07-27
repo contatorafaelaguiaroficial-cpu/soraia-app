@@ -18,6 +18,7 @@ type Meta = {
   valor_atual: number | string;
   valor_meta: number | string;
   created_at?: string;
+  prazo: string | null;
 };
 
 function moeda(valor: number) {
@@ -42,7 +43,7 @@ export default async function MetasPage() {
     ? await supabase
         .from("metas")
         .select(
-          "id, nome, valor_atual, valor_meta, created_at",
+          "id, nome, valor_atual, valor_meta, created_at, prazo",
         )
         .eq("user_id", user.id)
         .order("created_at", {
@@ -229,6 +230,27 @@ export default async function MetasPage() {
 
                   <div className="goal-card-content">
                     <h3>{meta.nome}</h3>
+
+                    {meta.prazo && (
+                      <span
+                        style={{
+                          display: "block",
+                          marginBottom: 12,
+                          color: "#918A9B",
+                          fontSize: 12,
+                        }}
+                      >
+                        Prazo:{" "}
+                        {new Intl.DateTimeFormat("pt-BR", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          timeZone: "UTC",
+                        }).format(
+                          new Date(`${meta.prazo}T00:00:00Z`),
+                        )}
+                      </span>
+                    )}
 
                     <div className="goal-values">
                       <strong>

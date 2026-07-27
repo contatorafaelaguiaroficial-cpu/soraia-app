@@ -14,6 +14,7 @@ export async function criarMeta(formData: FormData) {
 
   const nome = String(formData.get("nome") ?? "").trim();
   const valorMeta = Number(formData.get("valor_meta"));
+  const prazo = String(formData.get("prazo") ?? "").trim();
 
   if (!nome || !valorMeta || valorMeta <= 0) return;
 
@@ -22,6 +23,7 @@ export async function criarMeta(formData: FormData) {
     nome,
     valor_meta: valorMeta,
     valor_atual: 0,
+    prazo: prazo || null,
   });
 
   revalidatePath("/painel");
@@ -86,6 +88,10 @@ export async function editarMeta(
     formData.get("valor_meta"),
   );
 
+  const prazo = String(
+    formData.get("prazo") ?? "",
+  ).trim();
+
   if (!nome || !valorMeta || valorMeta <= 0) {
     return {
       sucesso: false,
@@ -98,6 +104,7 @@ export async function editarMeta(
     .update({
       nome,
       valor_meta: valorMeta,
+      prazo: prazo || null,
     })
     .eq("id", metaId)
     .eq("user_id", user.id);

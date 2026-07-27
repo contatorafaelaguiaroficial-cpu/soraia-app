@@ -17,12 +17,14 @@ type Props = {
   metaId: string;
   nomeAtual: string;
   valorAtual: number;
+  prazoAtual: string | null;
 };
 
 export default function MetaActions({
   metaId,
   nomeAtual,
   valorAtual,
+  prazoAtual,
 }: Props) {
   const [editando, setEditando] = useState(false);
   const [salvando, setSalvando] = useState(false);
@@ -121,6 +123,31 @@ export default function MetaActions({
               color: "#F4F1F8",
               border:
                 "1px solid rgba(255,255,255,0.09)",
+            }}
+          />
+
+          <label
+            className="block mb-2"
+            style={{
+              color: "#9C93AC",
+              fontSize: 12,
+              fontWeight: 700,
+            }}
+          >
+            Prazo para alcançar a meta
+          </label>
+
+          <input
+            name="prazo"
+            type="date"
+            defaultValue={prazoAtual ?? ""}
+            className="w-full mb-3 rounded-xl px-4 py-3 text-sm outline-none"
+            style={{
+              background: "#241E2D",
+              color: "#F4F1F8",
+              border:
+                "1px solid rgba(255,255,255,0.09)",
+              colorScheme: "dark",
             }}
           />
 
