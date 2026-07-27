@@ -72,9 +72,25 @@ export default async function PainelPage() {
       status: item.status,
     }));
 
+  const prioridadeInsights: Record<string, number> = {
+    "comparacao-mes-anterior": 1,
+    "maior-categoria": 2,
+    "maior-despesa": 3,
+    "media-diaria": 4,
+    "total-despesas": 5,
+    "quantidade-despesas": 6,
+    "sem-despesas": 7,
+  };
+
   const insights = gerarInsights(
     transacoesParaInsights,
-  ).slice(0, 3);
+  )
+    .sort(
+      (a, b) =>
+        (prioridadeInsights[a.id] ?? 99) -
+        (prioridadeInsights[b.id] ?? 99),
+    )
+    .slice(0, 3);
 
   const efetivadas = movimentacoes.filter(
     (item) =>
