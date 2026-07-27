@@ -73,13 +73,15 @@ export default async function PainelPage() {
     }));
 
   const prioridadeInsights: Record<string, number> = {
-    "comparacao-mes-anterior": 1,
-    "maior-categoria": 2,
-    "maior-despesa": 3,
-    "media-diaria": 4,
-    "total-despesas": 5,
-    "quantidade-despesas": 6,
-    "sem-despesas": 7,
+    "risco-saldo-negativo": 1,
+    "saldo-previsto-positivo": 2,
+    "comparacao-mes-anterior": 3,
+    "maior-categoria": 4,
+    "maior-despesa": 5,
+    "media-diaria": 6,
+    "total-despesas": 7,
+    "quantidade-despesas": 8,
+    "sem-despesas": 9,
   };
 
   const insights = gerarInsights(

@@ -94,6 +94,87 @@ export function gerarInsights(
 ): Insight[] {
   const insights: Insight[] = [];
 
+  const receitasRecebidas = transactions
+    .filter(
+      (transacao) =>
+        transacao.tipo === "receita" &&
+        transacao.status === "recebido",
+    )
+    .reduce(
+      (total, transacao) =>
+        total + Number(transacao.valor),
+      0,
+    );
+
+  const despesasPagas = transactions
+    .filter(
+      (transacao) =>
+        transacao.tipo === "despesa" &&
+        transacao.status === "pago",
+    )
+    .reduce(
+      (total, transacao) =>
+        total + Number(transacao.valor),
+      0,
+    );
+
+  const receitasPendentes = transactions
+    .filter(
+      (transacao) =>
+        transacao.tipo === "receita" &&
+        transacao.status === "pendente",
+    )
+    .reduce(
+      (total, transacao) =>
+        total + Number(transacao.valor),
+      0,
+    );
+
+  const despesasPendentes = transactions
+    .filter(
+      (transacao) =>
+        transacao.tipo === "despesa" &&
+        transacao.status === "pendente",
+    )
+    .reduce(
+      (total, transacao) =>
+        total + Number(transacao.valor),
+      0,
+    );
+
+  const saldoAtual =
+    receitasRecebidas - despesasPagas;
+
+  const saldoPrevisto =
+    saldoAtual +
+    receitasPendentes -
+    despesasPendentes;
+
+  if (saldoPrevisto < 0) {
+    insights.push({
+      id: "risco-saldo-negativo",
+      tipo: "alerta",
+      titulo: "Risco no saldo previsto",
+      mensagem: `Seus compromissos pendentes podem deixar seu saldo negativo em ${moeda(
+        Math.abs(saldoPrevisto),
+      )}. Revise os próximos pagamentos ou planeje novas entradas.`,
+      valor: saldoPrevisto,
+    });
+  } else if (
+    despesasPendentes > 0 &&
+    saldoPrevisto >= 0
+  ) {
+    insights.push({
+      id: "saldo-previsto-positivo",
+      tipo: "positivo",
+      titulo: "Saldo previsto positivo",
+      mensagem: `Após considerar os compromissos pendentes, seu saldo previsto é de ${moeda(
+        saldoPrevisto,
+      )}.`,
+      valor: saldoPrevisto,
+    });
+  }
+
   const despesasDoMes = transactions.filter(
     (transacao) =>
       transacao.tipo === "despesa" &&
@@ -115,15 +196,15 @@ export function gerarInsights(
   );
 
   if (despesasDoMes.length === 0) {
-    return [
-      {
-        id: "sem-despesas",
-        tipo: "informativo",
-        titulo: "Nenhuma despesa registrada",
-        mensagem:
-          "Você ainda não possui despesas pagas registradas neste mês.",
-      },
-    ];
+    insights.push({
+      id: "sem-despesas",
+      tipo: "informativo",
+      titulo: "Nenhuma despesa registrada",
+      mensagem:
+        "Você ainda não possui despesas pagas registradas neste mês.",
+    });
+
+    return insights;
   }
 
   const totalDespesas = despesasDoMes.reduce(
