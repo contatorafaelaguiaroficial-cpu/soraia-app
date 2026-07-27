@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 type SidebarProps = {
   collapsed: boolean;
   onToggle: () => void;
@@ -129,11 +128,18 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       <div className="soraia-sidebar__profile">
         <div className="soraia-sidebar__avatar">RA</div>
-        <div>
-          <strong>Rafael Aguiar</strong>
+        
+<Link href="/perfil" className="sidebar-profile-link">
+  <div className="sidebar-profile-card">
+    <strong>Rafael Aguiar</strong>
           <span>Soraia Pro</span>
-        </div>
+    <span className="sidebar-profile-arrow">›</span>
+  </div>
+</Link>
       </div>
-    </aside>
+    
+  
+</aside>
+
   );
 }
