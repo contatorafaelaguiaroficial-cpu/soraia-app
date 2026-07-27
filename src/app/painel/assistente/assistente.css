@@ -378,3 +378,181 @@
     margin: 0 13px 13px;
   }
 }
+
+/* ÁUDIO DA SORAIA */
+
+.assistant-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.assistant-composer textarea {
+  flex: 1;
+  min-width: 0;
+}
+
+.assistant-composer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.assistant-composer-actions button,
+.assistant-microphone,
+.assistant-send {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 0;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.assistant-microphone {
+  background: rgba(139, 92, 246, 0.1);
+  color: #b69cff;
+  border: 1px solid rgba(139, 92, 246, 0.22) !important;
+}
+
+.assistant-microphone:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.18);
+  transform: translateY(-1px);
+}
+
+.assistant-send {
+  background: linear-gradient(145deg, #8b5cf6, #6d28d9);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(109, 40, 217, 0.28);
+}
+
+.assistant-send:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.assistant-composer-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.assistant-composer.is-recording {
+  display: block;
+  padding: 8px;
+  border-color: rgba(255, 95, 122, 0.3);
+}
+
+.assistant-recording {
+  width: 100%;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.assistant-recording-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.assistant-recording-info > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.assistant-recording-info strong {
+  color: #f5f1fa;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.assistant-recording-info small {
+  color: #9f96aa;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.assistant-recording-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-radius: 999px;
+  background: #ff5f7a;
+  box-shadow: 0 0 0 5px rgba(255, 95, 122, 0.1);
+  animation: assistant-recording-pulse 1.2s infinite;
+}
+
+.assistant-recording-cancel,
+.assistant-recording-finish {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 0;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.assistant-recording-cancel {
+  background: rgba(255, 255, 255, 0.05);
+  color: #aaa1b4;
+}
+
+.assistant-recording-finish {
+  background: rgba(255, 95, 122, 0.14);
+  color: #ff7188;
+  border: 1px solid rgba(255, 95, 122, 0.22);
+}
+
+.assistant-recording-cancel:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.assistant-recording-finish:hover {
+  background: rgba(255, 95, 122, 0.22);
+}
+
+@keyframes assistant-recording-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@media (max-width: 720px) {
+  .assistant-composer {
+    gap: 7px;
+  }
+
+  .assistant-composer-actions {
+    gap: 6px;
+  }
+
+  .assistant-composer-actions button,
+  .assistant-microphone,
+  .assistant-send {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+  }
+}

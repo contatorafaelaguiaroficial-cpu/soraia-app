@@ -4,10 +4,13 @@ import {
   ArrowUp,
   Bot,
   LoaderCircle,
+  Mic,
   Send,
   Sparkles,
+  Square,
   UserRound,
   WalletCards,
+  X,
 } from "lucide-react";
 import {
   FormEvent,
@@ -36,6 +39,15 @@ function criarId() {
     .slice(2)}`;
 }
 
+function formatarTempo(segundos: number) {
+  const minutos = Math.floor(segundos / 60);
+  const segundosRestantes = segundos % 60;
+
+  return `${String(minutos).padStart(2, "0")}:${String(
+    segundosRestantes,
+  ).padStart(2, "0")}`;
+}
+
 export default function AssistenteFinanceiro() {
   const [mensagens, setMensagens] = useState<Mensagem[]>([
     {
@@ -48,18 +60,60 @@ export default function AssistenteFinanceiro() {
 
   const [texto, setTexto] = useState("");
   const [carregando, setCarregando] = useState(false);
+  const [gravando, setGravando] = useState(false);
+  const [processandoAudio, setProcessandoAudio] =
+    useState(false);
+  const [tempoGravacao, setTempoGravacao] = useState(0);
+
   const fimRef = useRef<HTMLDivElement>(null);
+  const mediaRecorderRef =
+    useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef =
+    useRef<ReturnType<typeof setInterval> | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const cancelarAudioRef = useRef(false);
 
   useEffect(() => {
     fimRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [mensagens, carregando]);
+  }, [mensagens, carregando, processandoAudio]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+
+      streamRef.current
+        ?.getTracks()
+        .forEach((track) => track.stop());
+    };
+  }, []);
+
+  function adicionarErro(mensagem: string) {
+    setMensagens((atual) => [
+      ...atual,
+      {
+        id: criarId(),
+        role: "assistant",
+        content: mensagem,
+      },
+    ]);
+  }
 
   async function enviarMensagem(mensagemManual?: string) {
     const pergunta = (mensagemManual ?? texto).trim();
 
-    if (!pergunta || carregando) return;
+    if (
+      !pergunta ||
+      carregando ||
+      gravando ||
+      processandoAudio
+    ) {
+      return;
+    }
 
     const mensagemUsuario: Mensagem = {
       id: criarId(),
@@ -100,7 +154,8 @@ export default function AssistenteFinanceiro() {
       if (!resposta.ok) {
         throw new Error(
           resultado.erro ||
-            "Não foi possível obter uma resposta."
+            resultado.error ||
+            "Não foi possível obter uma resposta.",
         );
       }
 
@@ -109,23 +164,276 @@ export default function AssistenteFinanceiro() {
         {
           id: criarId(),
           role: "assistant",
-          content: resultado.resposta,
+          content:
+            resultado.resposta ||
+            "Não consegui elaborar uma resposta.",
         },
       ]);
     } catch (error) {
+      adicionarErro(
+        error instanceof Error
+          ? error.message
+          : "Não consegui responder agora. Tente novamente.",
+      );
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function iniciarGravacao() {
+    if (
+      carregando ||
+      processandoAudio ||
+      gravando
+    ) {
+      return;
+    }
+
+    try {
+      if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+      ) {
+        adicionarErro(
+          "Este navegador não permite gravar áudio.",
+        );
+        return;
+      }
+
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+
+      streamRef.current = stream;
+      audioChunksRef.current = [];
+      cancelarAudioRef.current = false;
+      setTempoGravacao(0);
+
+      let mimeType = "";
+
+      if (
+        MediaRecorder.isTypeSupported(
+          "audio/webm;codecs=opus",
+        )
+      ) {
+        mimeType = "audio/webm;codecs=opus";
+      } else if (
+        MediaRecorder.isTypeSupported("audio/webm")
+      ) {
+        mimeType = "audio/webm";
+      } else if (
+        MediaRecorder.isTypeSupported("audio/mp4")
+      ) {
+        mimeType = "audio/mp4";
+      }
+
+      const gravador = mimeType
+        ? new MediaRecorder(stream, {
+            mimeType,
+          })
+        : new MediaRecorder(stream);
+
+      mediaRecorderRef.current = gravador;
+
+      gravador.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      gravador.onerror = () => {
+        adicionarErro(
+          "Ocorreu um erro durante a gravação do áudio.",
+        );
+
+        pararTracks();
+        limparTimer();
+        setGravando(false);
+      };
+
+      gravador.onstop = async () => {
+        pararTracks();
+        limparTimer();
+        setGravando(false);
+
+        if (cancelarAudioRef.current) {
+          audioChunksRef.current = [];
+          setTempoGravacao(0);
+          return;
+        }
+
+        if (audioChunksRef.current.length === 0) {
+          adicionarErro(
+            "Não consegui capturar o áudio. Tente novamente.",
+          );
+          return;
+        }
+
+        const tipoDoAudio =
+          gravador.mimeType || "audio/webm";
+
+        const audioBlob = new Blob(
+          audioChunksRef.current,
+          {
+            type: tipoDoAudio,
+          },
+        );
+
+        audioChunksRef.current = [];
+
+        await enviarAudio(audioBlob);
+      };
+
+      gravador.start(250);
+      setGravando(true);
+
+      timerRef.current = setInterval(() => {
+        setTempoGravacao((tempo) => tempo + 1);
+      }, 1000);
+    } catch (error) {
+      console.error(
+        "Erro ao acessar o microfone:",
+        error,
+      );
+
+      adicionarErro(
+        "Não foi possível acessar o microfone. Verifique se a permissão foi autorizada no navegador.",
+      );
+
+      pararTracks();
+      limparTimer();
+      setGravando(false);
+    }
+  }
+
+  function finalizarGravacao() {
+    const gravador = mediaRecorderRef.current;
+
+    if (
+      gravador &&
+      gravador.state === "recording"
+    ) {
+      cancelarAudioRef.current = false;
+      gravador.stop();
+    }
+  }
+
+  function cancelarGravacao() {
+    cancelarAudioRef.current = true;
+
+    const gravador = mediaRecorderRef.current;
+
+    if (
+      gravador &&
+      gravador.state === "recording"
+    ) {
+      gravador.stop();
+    } else {
+      pararTracks();
+      limparTimer();
+      setGravando(false);
+      setTempoGravacao(0);
+    }
+  }
+
+  function pararTracks() {
+    streamRef.current
+      ?.getTracks()
+      .forEach((track) => track.stop());
+
+    streamRef.current = null;
+  }
+
+  function limparTimer() {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }
+
+  async function enviarAudio(audioBlob: Blob) {
+    setProcessandoAudio(true);
+
+    try {
+      const extensao = audioBlob.type.includes("mp4")
+        ? "mp4"
+        : "webm";
+
+      const arquivo = new File(
+        [audioBlob],
+        `audio-soraia-${Date.now()}.${extensao}`,
+        {
+          type: audioBlob.type,
+        },
+      );
+
+      const formData = new FormData();
+      formData.append("audio", arquivo);
+
+      const resposta = await fetch(
+        "/api/assistente/audio",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      const resultado = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(
+          resultado.erro ||
+            resultado.error ||
+            resultado.resposta ||
+            "Não foi possível processar o áudio.",
+        );
+      }
+
+      const transcricao = String(
+        resultado.transcricao ||
+          resultado.texto ||
+          "",
+      ).trim();
+
+      const respostaSoraia = String(
+        resultado.resposta ||
+          "Áudio processado com sucesso.",
+      ).trim();
+
+      if (transcricao) {
+        setMensagens((atual) => [
+          ...atual,
+          {
+            id: criarId(),
+            role: "user",
+            content: `🎤 ${transcricao}`,
+          },
+        ]);
+      }
+
       setMensagens((atual) => [
         ...atual,
         {
           id: criarId(),
           role: "assistant",
-          content:
-            error instanceof Error
-              ? error.message
-              : "Não consegui responder agora. Tente novamente.",
+          content: respostaSoraia,
         },
       ]);
+    } catch (error) {
+      console.error(
+        "Erro ao enviar áudio:",
+        error,
+      );
+
+      adicionarErro(
+        error instanceof Error
+          ? error.message
+          : "Não consegui processar seu áudio. Tente novamente.",
+      );
     } finally {
-      setCarregando(false);
+      setProcessandoAudio(false);
+      setTempoGravacao(0);
     }
   }
 
@@ -135,7 +443,7 @@ export default function AssistenteFinanceiro() {
   }
 
   function handleKeyDown(
-    event: KeyboardEvent<HTMLTextAreaElement>
+    event: KeyboardEvent<HTMLTextAreaElement>,
   ) {
     if (
       event.key === "Enter" &&
@@ -191,7 +499,11 @@ export default function AssistenteFinanceiro() {
                 onClick={() =>
                   enviarMensagem(pergunta)
                 }
-                disabled={carregando}
+                disabled={
+                  carregando ||
+                  gravando ||
+                  processandoAudio
+                }
               >
                 {pergunta}
                 <ArrowUp size={15} />
@@ -213,7 +525,9 @@ export default function AssistenteFinanceiro() {
 
             <div>
               <strong>Soraia</strong>
-              <span>Assistente financeira pessoal</span>
+              <span>
+                Assistente financeira pessoal
+              </span>
             </div>
           </div>
 
@@ -247,7 +561,7 @@ export default function AssistenteFinanceiro() {
               </article>
             ))}
 
-            {carregando && (
+            {(carregando || processandoAudio) && (
               <article className="assistant-message is-assistant">
                 <div className="assistant-message-avatar">
                   <Bot size={18} />
@@ -258,7 +572,10 @@ export default function AssistenteFinanceiro() {
 
                   <div className="assistant-thinking">
                     <LoaderCircle size={16} />
-                    Analisando suas finanças...
+
+                    {processandoAudio
+                      ? "Ouvindo e analisando seu áudio..."
+                      : "Analisando suas finanças..."}
                   </div>
                 </div>
               </article>
@@ -268,37 +585,100 @@ export default function AssistenteFinanceiro() {
           </div>
 
           <form
-            className="assistant-composer"
+            className={`assistant-composer ${
+              gravando ? "is-recording" : ""
+            }`}
             onSubmit={handleSubmit}
           >
-            <textarea
-              value={texto}
-              onChange={(event) =>
-                setTexto(event.target.value)
-              }
-              onKeyDown={handleKeyDown}
-              placeholder="Pergunte sobre seu saldo, contas ou uma possível compra..."
-              rows={1}
-              maxLength={2_000}
-              disabled={carregando}
-            />
+            {gravando ? (
+              <div className="assistant-recording">
+                <button
+                  type="button"
+                  className="assistant-recording-cancel"
+                  onClick={cancelarGravacao}
+                  title="Cancelar gravação"
+                >
+                  <X size={19} />
+                </button>
 
-            <button
-              type="submit"
-              disabled={
-                carregando || !texto.trim()
-              }
-              title="Enviar mensagem"
-            >
-              {carregando ? (
-                <LoaderCircle
-                  size={19}
-                  className="assistant-spinner"
+                <div className="assistant-recording-info">
+                  <span className="assistant-recording-dot" />
+
+                  <div>
+                    <strong>Gravando áudio</strong>
+                    <small>
+                      {formatarTempo(tempoGravacao)}
+                    </small>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="assistant-recording-finish"
+                  onClick={finalizarGravacao}
+                  title="Finalizar e enviar áudio"
+                >
+                  <Square size={17} fill="currentColor" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <textarea
+                  value={texto}
+                  onChange={(event) =>
+                    setTexto(event.target.value)
+                  }
+                  onKeyDown={handleKeyDown}
+                  placeholder="Pergunte sobre seu saldo, contas ou uma possível compra..."
+                  rows={1}
+                  maxLength={2_000}
+                  disabled={
+                    carregando || processandoAudio
+                  }
                 />
-              ) : (
-                <Send size={19} />
-              )}
-            </button>
+
+                <div className="assistant-composer-actions">
+                  <button
+                    type="button"
+                    className="assistant-microphone"
+                    onClick={iniciarGravacao}
+                    disabled={
+                      carregando || processandoAudio
+                    }
+                    title="Gravar áudio"
+                  >
+                    {processandoAudio ? (
+                      <LoaderCircle
+                        size={19}
+                        className="assistant-spinner"
+                      />
+                    ) : (
+                      <Mic size={19} />
+                    )}
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="assistant-send"
+                    disabled={
+                      carregando ||
+                      processandoAudio ||
+                      !texto.trim()
+                    }
+                    title="Enviar mensagem"
+                  >
+                    {carregando ? (
+                      <LoaderCircle
+                        size={19}
+                        className="assistant-spinner"
+                      />
+                    ) : (
+                      <Send size={19} />
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
           </form>
         </section>
       </section>
