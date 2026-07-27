@@ -19,6 +19,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useSearchParams } from "next/navigation";
 
 type Mensagem = {
   id: string;
@@ -49,6 +50,9 @@ function formatarTempo(segundos: number) {
 }
 
 export default function AssistenteFinanceiro() {
+  const searchParams = useSearchParams();
+  const mensagemInicialEnviadaRef = useRef(false);
+
   const [mensagens, setMensagens] = useState<Mensagem[]>([
     {
       id: "boas-vindas",
@@ -179,6 +183,28 @@ export default function AssistenteFinanceiro() {
       setCarregando(false);
     }
   }
+
+  useEffect(() => {
+    const mensagemInicial =
+      searchParams.get("mensagem")?.trim() || "";
+
+    if (
+      !mensagemInicial ||
+      mensagemInicialEnviadaRef.current
+    ) {
+      return;
+    }
+
+    mensagemInicialEnviadaRef.current = true;
+
+    window.history.replaceState(
+      {},
+      "",
+      "/painel/assistente",
+    );
+
+    void enviarMensagem(mensagemInicial);
+  }, [searchParams]);
 
   async function iniciarGravacao() {
     if (

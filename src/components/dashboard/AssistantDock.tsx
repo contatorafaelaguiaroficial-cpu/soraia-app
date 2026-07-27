@@ -1,12 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AssistantDock({ collapsed }: { collapsed: boolean }) {
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   function submit() {
-    if (!message.trim()) return;
+    const texto = message.trim();
+
+    if (!texto) {
+      router.push("/painel/assistente");
+      return;
+    }
+
+    router.push(
+      `/painel/assistente?mensagem=${encodeURIComponent(texto)}`,
+    );
+
     setMessage("");
   }
 
