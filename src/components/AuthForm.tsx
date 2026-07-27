@@ -214,7 +214,7 @@ export default function AuthForm({ modoInicial }: { modoInicial: Modo }) {
           style={{ background: "#FFFFFF", color: "#1D1D1F" }}
         >
           <GoogleIcon />
-          Continuar com Google
+          Entrar com Google
         </button>
 
         {modo === "entrar" && (

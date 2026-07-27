@@ -1,5 +1,5 @@
-import AuthForm from "@/components/AuthForm";
+import SoraiaLogin from "@/components/SoraiaLogin/SoraiaLogin";
 
 export default function LoginPage() {
-  return <AuthForm modoInicial="entrar" />;
+  return <SoraiaLogin />;
 }
