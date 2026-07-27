@@ -23,11 +23,17 @@ export type RegistrarTransacaoArgs = {
   status: StatusTransacao;
 };
 
+export type MensagemHistorico = {
+  role: "user" | "assistant";
+  content: string;
+};
+
 export type ProcessarMensagemParams = {
   mensagem: string;
   userId: string;
   origem: OrigemMensagem;
   supabase: SupabaseClient;
+  historico?: MensagemHistorico[];
 };
 
 export type ResultadoProcessamento = {

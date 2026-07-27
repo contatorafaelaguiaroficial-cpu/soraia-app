@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 
 import { registrarTransacao } from "@/lib/soraia/actions";
+import { gerarInsights } from "@/lib/soraia/insights";
 import type {
   ProcessarMensagemParams,
   RegistrarTransacaoArgs,
@@ -194,8 +195,13 @@ function criarConfirmacao(
 export async function processarMensagem(
   params: ProcessarMensagemParams,
 ): Promise<ResultadoProcessamento> {
-  const { mensagem, userId, origem, supabase } =
-    params;
+  const {
+    mensagem,
+    userId,
+    origem,
+    supabase,
+    historico = [],
+  } = params;
 
   if (!process.env.OPENAI_API_KEY) {
     throw new Error(
@@ -230,6 +236,7 @@ export async function processarMensagem(
 
   const transactions = (data ?? []) as Transaction[];
   const resumo = resumirTransacoes(transactions);
+  const insights = gerarInsights(transactions);
   const hoje = dataHojeBrasil();
 
   const openai = new OpenAI({
@@ -343,8 +350,29 @@ Responda sempre em português do Brasil.
 
 DADOS FINANCEIROS DO USUÁRIO:
 ${JSON.stringify(resumo)}
+
+INSIGHTS FINANCEIROS CALCULADOS:
+${JSON.stringify(insights)}
+
+Use esses insights quando o usuário perguntar:
+- como estão minhas finanças;
+- onde estou gastando mais;
+- qual foi minha maior despesa;
+- quanto estou gastando por dia;
+- quanto gastei neste mês.
+
+Não invente valores ou insights diferentes dos dados fornecidos.
       `,
-      input: texto,
+      input: [
+        ...historico.map((item) => ({
+          role: item.role,
+          content: item.content,
+        })),
+        {
+          role: "user",
+          content: texto,
+        },
+      ] as OpenAI.Responses.ResponseInput,
       tools,
       tool_choice: "auto",
     });

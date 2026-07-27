@@ -11,6 +11,24 @@ export async function POST(request: Request) {
     const body = await request.json();
     const mensagem = String(body?.mensagem ?? "").trim();
 
+    const historico = Array.isArray(body?.historico)
+      ? body.historico
+          .filter(
+            (item: unknown): item is {
+              role: "user" | "assistant";
+              content: string;
+            } =>
+              typeof item === "object" &&
+              item !== null &&
+              "role" in item &&
+              "content" in item &&
+              (item.role === "user" ||
+                item.role === "assistant") &&
+              typeof item.content === "string",
+          )
+          .slice(-8)
+      : [];
+
     if (!mensagem) {
       return NextResponse.json(
         {
@@ -41,6 +59,7 @@ export async function POST(request: Request) {
       userId: user.id,
       origem: "app_texto",
       supabase,
+      historico,
     });
 
     return NextResponse.json(resultado);
