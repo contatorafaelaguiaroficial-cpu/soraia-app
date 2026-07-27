@@ -3,6 +3,7 @@ import { Sparkles, Target } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import SairButton from "@/components/SairButton";
 import NovaMetaForm from "@/components/NovaMetaForm";
+import Link from "next/link";
 import { Card, CircularProgress, INK, MUTED } from "@/components/ui";
 
 const PURPLE = "#8B5CF6";
@@ -87,20 +88,22 @@ export default async function PainelPage() {
           {listaMetas.map((m) => {
             const pct = m.valor_meta > 0 ? Math.round((m.valor_atual / m.valor_meta) * 100) : 0;
             return (
-              <Card key={m.id} className="flex items-center gap-3.5">
-                <CircularProgress pct={pct} size={50} stroke={5} tone="nectarine">
-                  <Target size={18} color="#8B5CF6" strokeWidth={2.2} />
-                </CircularProgress>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span style={{ color: INK, fontWeight: 800, fontSize: 14 }}>{m.nome}</span>
-                    <span style={{ color: "#8B5CF6", fontWeight: 800, fontSize: 13 }}>{pct}%</span>
+              <Link key={m.id} href={`/painel/metas/${m.id}`} className="block">
+                <Card className="flex items-center gap-3.5">
+                  <CircularProgress pct={pct} size={50} stroke={5} tone="nectarine">
+                    <Target size={18} color="#8B5CF6" strokeWidth={2.2} />
+                  </CircularProgress>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span style={{ color: INK, fontWeight: 800, fontSize: 14 }}>{m.nome}</span>
+                      <span style={{ color: "#8B5CF6", fontWeight: 800, fontSize: 13 }}>{pct}%</span>
+                    </div>
+                    <span style={{ color: MUTED, fontWeight: 700, fontSize: 11.5 }}>
+                      R$ {m.valor_atual.toLocaleString("pt-BR")} de R$ {m.valor_meta.toLocaleString("pt-BR")}
+                    </span>
                   </div>
-                  <span style={{ color: MUTED, fontWeight: 700, fontSize: 11.5 }}>
-                    R$ {m.valor_atual.toLocaleString("pt-BR")} de R$ {m.valor_meta.toLocaleString("pt-BR")}
-                  </span>
-                </div>
-              </Card>
+                </Card>
+              </Link>
             );
           })}
 
