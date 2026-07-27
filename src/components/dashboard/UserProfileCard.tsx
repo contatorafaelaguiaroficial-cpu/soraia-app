@@ -71,7 +71,7 @@ export default function UserProfileCard() {
 
         <div className="sidebar-user-content">
           <strong>{usuario.nome.split(' ')[0]}</strong>
-          <span>Soraia Pro</span>
+          <span>Plano Free</span>
         </div>
 
         <ChevronRight
