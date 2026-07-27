@@ -1,20 +1,22 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import "./SoraiaLogin.css";
 
 type Mode = "login" | "signup";
 
 interface SoraiaLoginProps {
-  initialMode?: Mode;
+  onEmailLogin?: (email: string, password: string) => Promise<void> | void;
+  onGoogleLogin?: () => Promise<void> | void;
+  onForgotPassword?: (email: string) => Promise<void> | void;
 }
 
-export default function SoraiaLogin({ initialMode = "login" }: SoraiaLoginProps) {
-  const router = useRouter();
-  const [mode, setMode] = useState<Mode>(initialMode);
-  const [name, setName] = useState("");
+export default function SoraiaLogin({
+  onEmailLogin,
+  onGoogleLogin,
+  onForgotPassword,
+}: SoraiaLoginProps) {
+  const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -34,61 +36,36 @@ export default function SoraiaLogin({ initialMode = "login" }: SoraiaLoginProps)
     ["Conta criada.", "Vamos organizar sua vida."],
   ];
 
-  const wait = (milliseconds: number) =>
-    new Promise((resolve) => window.setTimeout(resolve, milliseconds));
-
   const runLoadingSequence = async () => {
     const steps = mode === "login" ? loginSteps : signupSteps;
     setLoading(true);
+    setLoadingStep(0);
 
     for (let index = 0; index < steps.length; index += 1) {
       setLoadingStep(index);
-      await wait(index === steps.length - 1 ? 350 : 550);
+      await new Promise((resolve) => window.setTimeout(resolve, 850));
     }
+
+    setLoading(false);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage("");
-    setLoading(true);
-    setLoadingStep(0);
 
     try {
-      const supabase = createClient();
-
-      if (mode === "signup") {
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            data: { nome: name.trim() },
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=/painel`,
-          },
-        });
-
-        if (error) throw error;
-
-        if (!data.session) {
-          setLoading(false);
-          setMessage("Conta criada. Confirme o link enviado ao seu e-mail para continuar.");
-          return;
-        }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-
-        if (error) {
-          throw new Error("E-mail ou senha incorretos.");
-        }
-      }
-
       await runLoadingSequence();
-      router.replace("/painel");
-      router.refresh();
+
+      if (onEmailLogin) {
+        await onEmailLogin(email, password);
+      } else {
+        setMessage(
+          mode === "login"
+            ? "Login demonstrativo concluído."
+            : "Cadastro demonstrativo concluído."
+        );
+      }
     } catch (error) {
-      setLoading(false);
       setMessage(
         error instanceof Error
           ? error.message
@@ -101,15 +78,11 @@ export default function SoraiaLogin({ initialMode = "login" }: SoraiaLoginProps)
     setMessage("");
 
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/painel`,
-        },
-      });
-
-      if (error) throw error;
+      if (onGoogleLogin) {
+        await onGoogleLogin();
+      } else {
+        setMessage("Integração com Google pronta para conectar ao Supabase.");
+      }
     } catch (error) {
       setMessage(
         error instanceof Error
@@ -120,21 +93,17 @@ export default function SoraiaLogin({ initialMode = "login" }: SoraiaLoginProps)
   };
 
   const handleForgotPassword = async () => {
-    if (!email.trim()) {
+    if (!email) {
       setMessage("Digite seu e-mail para redefinir a senha.");
       return;
     }
 
-    setMessage("");
-
     try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/redefinir-senha`,
-      });
-
-      if (error) throw error;
-      setMessage("Enviamos um link de recuperação para o seu e-mail.");
+      if (onForgotPassword) {
+        await onForgotPassword(email);
+      } else {
+        setMessage("Enviaremos um link para redefinir sua senha.");
+      }
     } catch (error) {
       setMessage(
         error instanceof Error
@@ -259,27 +228,6 @@ export default function SoraiaLogin({ initialMode = "login" }: SoraiaLoginProps)
             </div>
 
             <form onSubmit={handleSubmit}>
-              {mode === "signup" && (
-                <div className="soraia-field">
-                  <div className="soraia-field-head">
-                    <label htmlFor="name">Nome</label>
-                  </div>
-
-                  <div className="soraia-input-wrap">
-                    <UserIcon />
-                    <input
-                      id="name"
-                      type="text"
-                      placeholder="Como você quer ser chamado?"
-                      autoComplete="name"
-                      value={name}
-                      onChange={(event) => setName(event.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-
               <div className="soraia-field">
                 <div className="soraia-field-head">
                   <label htmlFor="email">E-mail</label>
@@ -303,15 +251,13 @@ export default function SoraiaLogin({ initialMode = "login" }: SoraiaLoginProps)
                 <div className="soraia-field-head">
                   <label htmlFor="password">Senha</label>
 
-                  {mode === "login" && (
-                    <button
-                      className="soraia-forgot"
-                      type="button"
-                      onClick={handleForgotPassword}
-                    >
-                      Esqueci minha senha
-                    </button>
-                  )}
+                  <button
+                    className="soraia-forgot"
+                    type="button"
+                    onClick={handleForgotPassword}
+                  >
+                    Esqueci minha senha
+                  </button>
                 </div>
 
                 <div className="soraia-input-wrap">
@@ -340,7 +286,7 @@ export default function SoraiaLogin({ initialMode = "login" }: SoraiaLoginProps)
                 </div>
               </div>
 
-              <button className="soraia-primary" type="submit" disabled={loading}>
+              <button className="soraia-primary" type="submit">
                 {mode === "login" ? "Entrar" : "Criar minha conta"}
               </button>
             </form>
@@ -424,15 +370,6 @@ function BrainIcon() {
         strokeWidth="1.5"
         strokeLinecap="round"
       />
-    </svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.7" />
-      <path d="M4.5 20c.8-4 3.3-6 7.5-6s6.7 2 7.5 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   );
 }

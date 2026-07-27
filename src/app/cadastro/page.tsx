@@ -1,5 +1,5 @@
-import AuthForm from "@/components/AuthForm";
+import SoraiaLogin from "@/components/SoraiaLogin/SoraiaLogin";
 
 export default function CadastroPage() {
-  return <AuthForm modoInicial="criar" />;
+  return <SoraiaLogin initialMode="signup" />;
 }

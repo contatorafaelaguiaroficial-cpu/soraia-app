@@ -13,9 +13,7 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options)
@@ -25,24 +23,8 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
-  const pathname = request.nextUrl.pathname;
-  const isPainel = pathname === "/painel" || pathname.startsWith("/painel/");
-  const isAuthPage = pathname === "/login" || pathname === "/cadastro";
-
-  if (isPainel && !user) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (isAuthPage && user) {
-    const painelUrl = request.nextUrl.clone();
-    painelUrl.pathname = "/painel";
-    painelUrl.search = "";
-    return NextResponse.redirect(painelUrl);
-  }
+  // isso renova o token de sessão se estiver perto de expirar
+  await supabase.auth.getUser();
 
   return response;
 }
