@@ -48,17 +48,45 @@ function obterDataAtualBrasil() {
   };
 }
 
-function pertenceAoMesAtual(data: string) {
+function pertenceAoMes(
+  data: string,
+  ano: number,
+  mes: number,
+) {
   const [anoTransacao, mesTransacao] = data
     .split("-")
     .map(Number);
 
+  return (
+    anoTransacao === ano &&
+    mesTransacao === mes
+  );
+}
+
+function pertenceAoMesAtual(data: string) {
   const hoje = obterDataAtualBrasil();
 
-  return (
-    anoTransacao === hoje.ano &&
-    mesTransacao === hoje.mes
+  return pertenceAoMes(
+    data,
+    hoje.ano,
+    hoje.mes,
   );
+}
+
+function obterMesAnterior() {
+  const hoje = obterDataAtualBrasil();
+
+  if (hoje.mes === 1) {
+    return {
+      ano: hoje.ano - 1,
+      mes: 12,
+    };
+  }
+
+  return {
+    ano: hoje.ano,
+    mes: hoje.mes - 1,
+  };
 }
 
 export function gerarInsights(
@@ -71,6 +99,19 @@ export function gerarInsights(
       transacao.tipo === "despesa" &&
       transacao.status === "pago" &&
       pertenceAoMesAtual(transacao.data),
+  );
+
+  const mesAnterior = obterMesAnterior();
+
+  const despesasMesAnterior = transactions.filter(
+    (transacao) =>
+      transacao.tipo === "despesa" &&
+      transacao.status === "pago" &&
+      pertenceAoMes(
+        transacao.data,
+        mesAnterior.ano,
+        mesAnterior.mes,
+      ),
   );
 
   if (despesasDoMes.length === 0) {
@@ -90,6 +131,60 @@ export function gerarInsights(
       total + Number(transacao.valor),
     0,
   );
+
+  const totalMesAnterior =
+    despesasMesAnterior.reduce(
+      (total, transacao) =>
+        total + Number(transacao.valor),
+      0,
+    );
+
+  if (totalMesAnterior > 0) {
+    const variacao =
+      ((totalDespesas - totalMesAnterior) /
+        totalMesAnterior) *
+      100;
+
+    const percentual = Math.abs(
+      Math.round(variacao),
+    );
+
+    if (variacao > 0) {
+      insights.push({
+        id: "comparacao-mes-anterior",
+        tipo: "alerta",
+        titulo: "Comparação mensal",
+        mensagem: `Você gastou ${percentual}% a mais que no mês passado. Neste mês foram ${moeda(
+          totalDespesas,
+        )}, contra ${moeda(
+          totalMesAnterior,
+        )} no mês anterior.`,
+        valor: totalDespesas,
+      });
+    } else if (variacao < 0) {
+      insights.push({
+        id: "comparacao-mes-anterior",
+        tipo: "positivo",
+        titulo: "Comparação mensal",
+        mensagem: `Você gastou ${percentual}% a menos que no mês passado. Neste mês foram ${moeda(
+          totalDespesas,
+        )}, contra ${moeda(
+          totalMesAnterior,
+        )} no mês anterior.`,
+        valor: totalDespesas,
+      });
+    } else {
+      insights.push({
+        id: "comparacao-mes-anterior",
+        tipo: "informativo",
+        titulo: "Comparação mensal",
+        mensagem: `Seus gastos permaneceram iguais aos do mês passado: ${moeda(
+          totalDespesas,
+        )}.`,
+        valor: totalDespesas,
+      });
+    }
+  }
 
   const totaisPorCategoria = new Map<
     string,
