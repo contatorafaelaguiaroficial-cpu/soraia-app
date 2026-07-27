@@ -1,8 +1,15 @@
 import OpenAI from "openai";
 
-import { registrarTransacao } from "@/lib/soraia/actions";
+import {
+  adicionarAporteMetaSoraia,
+  criarMetaSoraia,
+  registrarTransacao,
+} from "@/lib/soraia/actions";
 import { gerarInsights } from "@/lib/soraia/insights";
 import type {
+  AdicionarAporteMetaArgs,
+  CriarMetaArgs,
+  MetaFinanceira,
   ProcessarMensagemParams,
   RegistrarTransacaoArgs,
   ResultadoProcessamento,
@@ -139,6 +146,66 @@ const tools = [
       ],
     },
   },
+  {
+    type: "function" as const,
+    name: "criar_meta",
+    description:
+      "Cria uma nova meta financeira quando o usuário expressa claramente que deseja criar, definir ou montar uma meta e informa o valor desejado.",
+    strict: true,
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        nome: {
+          type: "string",
+          description:
+            "Nome curto da meta, como Reserva de emergência, Viagem, Carro ou Casa própria.",
+        },
+        valor_meta: {
+          type: "number",
+          description:
+            "Valor total positivo que o usuário deseja alcançar.",
+        },
+        prazo: {
+          type: "string",
+          description:
+            "Prazo no formato YYYY-MM-DD. Use string vazia quando o usuário não informar prazo.",
+        },
+      },
+      required: [
+        "nome",
+        "valor_meta",
+        "prazo",
+      ],
+    },
+  },
+  {
+    type: "function" as const,
+    name: "adicionar_aporte_meta",
+    description:
+      "Adiciona dinheiro a uma meta existente quando o usuário diz que guardou, reservou, colocou ou adicionou determinado valor naquela meta.",
+    strict: true,
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        nome_meta: {
+          type: "string",
+          description:
+            "Nome da meta existente mencionada pelo usuário.",
+        },
+        valor: {
+          type: "number",
+          description:
+            "Valor positivo que deve ser adicionado à meta.",
+        },
+      },
+      required: [
+        "nome_meta",
+        "valor",
+      ],
+    },
+  },
 ];
 
 function criarConfirmacao(
@@ -235,6 +302,31 @@ export async function processarMensagem(
   }
 
   const transactions = (data ?? []) as Transaction[];
+
+  const {
+    data: dadosMetas,
+    error: erroMetas,
+  } = await supabase
+    .from("metas")
+    .select(
+      "id, nome, valor_atual, valor_meta, prazo",
+    )
+    .eq("user_id", userId)
+    .order("created_at", {
+      ascending: true,
+    });
+
+  if (erroMetas) {
+    console.error(
+      "Erro ao carregar metas:",
+      erroMetas,
+    );
+  }
+
+  const metas = (
+    dadosMetas ?? []
+  ) as MetaFinanceira[];
+
   const resumo = resumirTransacoes(transactions);
   const insights = gerarInsights(transactions);
   const hoje = dataHojeBrasil();
@@ -257,6 +349,19 @@ Sua principal função é interpretar linguagem natural, analisar as finanças d
 
 REGRA PRINCIPAL:
 Quando a mensagem informar uma movimentação financeira real e contiver um valor, execute imediatamente a ferramenta registrar_transacao.
+
+METAS FINANCEIRAS:
+- Quando o usuário pedir claramente para criar, definir ou montar uma meta e informar o valor total desejado, execute criar_meta.
+- Não confunda uma meta com uma despesa.
+- "Quero criar uma meta de R$ 10.000 para viajar" cria uma meta e não registra despesa.
+- "Minha meta é guardar R$ 5.000 até dezembro" cria uma meta.
+- Quando houver um prazo, converta-o para YYYY-MM-DD considerando a data atual.
+- Quando não houver prazo, use uma string vazia.
+- Quando o usuário disser que guardou, reservou, colocou ou adicionou dinheiro em uma meta existente, execute adicionar_aporte_meta.
+- "Guardei R$ 500 na reserva de emergência" adiciona um aporte à meta e não registra uma despesa.
+- Para consultas sobre metas, use os dados fornecidos e não execute ferramentas.
+- Não crie uma meta em perguntas hipotéticas ou simulações.
+- Nunca diga que uma meta foi criada ou recebeu aporte sem executar a ferramenta correspondente.
 
 NÃO peça confirmação antes de registrar.
 
@@ -354,6 +459,15 @@ ${JSON.stringify(resumo)}
 INSIGHTS FINANCEIROS CALCULADOS:
 ${JSON.stringify(insights)}
 
+METAS FINANCEIRAS DO USUÁRIO:
+${JSON.stringify(metas)}
+
+Ao responder sobre metas:
+- valor restante = valor_meta menos valor_atual;
+- progresso percentual = valor_atual dividido por valor_meta;
+- nunca invente metas, valores ou prazos;
+- quando houver prazo, informe quanto falta guardar por mês apenas quando isso for solicitado ou útil.
+
 Use esses insights quando o usuário perguntar:
 - como estão minhas finanças;
 - onde estou gastando mais;
@@ -378,9 +492,7 @@ Não invente valores ou insights diferentes dos dados fornecidos.
     });
 
   const chamadas = primeiraResposta.output.filter(
-    (item) =>
-      item.type === "function_call" &&
-      item.name === "registrar_transacao",
+    (item) => item.type === "function_call",
   );
 
   if (chamadas.length === 0) {
@@ -393,63 +505,162 @@ Não invente valores ou insights diferentes dos dados fornecidos.
     };
   }
 
-  const transacoesRegistradas: RegistrarTransacaoArgs[] =
-    [];
+  const transacoesRegistradas:
+    RegistrarTransacaoArgs[] = [];
+
+  const confirmacoes: string[] = [];
+  const errosFerramentas: string[] = [];
 
   for (const chamada of chamadas) {
+    if (chamada.type !== "function_call") {
+      continue;
+    }
+
+    if (chamada.name === "registrar_transacao") {
+      let argumentos: RegistrarTransacaoArgs;
+
+      try {
+        argumentos = JSON.parse(
+          chamada.arguments,
+        ) as RegistrarTransacaoArgs;
+      } catch (erro) {
+        console.error(
+          "Argumentos inválidos da transação:",
+          erro,
+        );
+        continue;
+      }
+
+      const resultado = await registrarTransacao({
+        supabase,
+        userId,
+        argumentos,
+        hoje,
+      });
+
+      if (resultado.sucesso) {
+        transacoesRegistradas.push(
+          resultado.transacao,
+        );
+      } else {
+        errosFerramentas.push(resultado.erro);
+      }
+
+      continue;
+    }
+
+    if (chamada.name === "criar_meta") {
+      let argumentos: CriarMetaArgs;
+
+      try {
+        argumentos = JSON.parse(
+          chamada.arguments,
+        ) as CriarMetaArgs;
+      } catch (erro) {
+        console.error(
+          "Argumentos inválidos da meta:",
+          erro,
+        );
+        continue;
+      }
+
+      const resultado = await criarMetaSoraia({
+        supabase,
+        userId,
+        argumentos,
+      });
+
+      if (resultado.sucesso) {
+        const prazoTexto = resultado.meta.prazo
+          ? `, com prazo até ${new Intl.DateTimeFormat(
+              "pt-BR",
+              {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                timeZone: "UTC",
+              },
+            ).format(
+              new Date(
+                `${resultado.meta.prazo}T00:00:00Z`,
+              ),
+            )}`
+          : "";
+
+        confirmacoes.push(
+          `Pronto! Criei a meta "${resultado.meta.nome}" no valor de ${moeda(
+            Number(resultado.meta.valor_meta),
+          )}${prazoTexto}. 🎯`,
+        );
+      } else {
+        errosFerramentas.push(resultado.erro);
+      }
+
+      continue;
+    }
+
     if (
-      chamada.type !== "function_call" ||
-      chamada.name !== "registrar_transacao"
+      chamada.name === "adicionar_aporte_meta"
     ) {
-      continue;
-    }
+      let argumentos: AdicionarAporteMetaArgs;
 
-    let argumentos: RegistrarTransacaoArgs;
+      try {
+        argumentos = JSON.parse(
+          chamada.arguments,
+        ) as AdicionarAporteMetaArgs;
+      } catch (erro) {
+        console.error(
+          "Argumentos inválidos do aporte:",
+          erro,
+        );
+        continue;
+      }
 
-    try {
-      argumentos = JSON.parse(
-        chamada.arguments,
-      ) as RegistrarTransacaoArgs;
-    } catch (erro) {
-      console.error(
-        "Argumentos inválidos da ferramenta:",
-        erro,
-      );
-      continue;
-    }
+      const resultado =
+        await adicionarAporteMetaSoraia({
+          supabase,
+          userId,
+          argumentos,
+        });
 
-    const resultado = await registrarTransacao({
-      supabase,
-      userId,
-      argumentos,
-      hoje,
-    });
+      if (resultado.sucesso) {
+        const restante = Math.max(
+          Number(resultado.meta.valor_meta) -
+            Number(resultado.meta.valor_atual),
+          0,
+        );
 
-    if (resultado.sucesso) {
-      transacoesRegistradas.push(
-        resultado.transacao,
-      );
-    } else {
-      console.error(
-        "Erro ao registrar transação:",
-        resultado,
-      );
+        confirmacoes.push(
+          `Pronto! Adicionei ${moeda(
+            resultado.valor_aporte,
+          )} à meta "${resultado.meta.nome}". Agora ela está com ${moeda(
+            Number(resultado.meta.valor_atual),
+          )} e faltam ${moeda(restante)}. ✅`,
+        );
+      } else {
+        errosFerramentas.push(resultado.erro);
+      }
     }
   }
 
-  if (transacoesRegistradas.length === 0) {
+  if (transacoesRegistradas.length > 0) {
+    confirmacoes.unshift(
+      criarConfirmacao(transacoesRegistradas),
+    );
+  }
+
+  if (confirmacoes.length === 0) {
     return {
       resposta:
-        "Entendi a movimentação, mas não consegui salvá-la. Tente novamente.",
+        errosFerramentas[0] ||
+        "Entendi o pedido, mas não consegui salvar. Tente novamente.",
       acaoExecutada: false,
       transacoes: [],
     };
   }
 
   return {
-    resposta: criarConfirmacao(
-      transacoesRegistradas,
-    ),
+    resposta: confirmacoes.join("\n\n"),
     acaoExecutada: true,
     transacoes: transacoesRegistradas,
   };

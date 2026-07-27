@@ -23,6 +23,25 @@ export type RegistrarTransacaoArgs = {
   status: StatusTransacao;
 };
 
+export type MetaFinanceira = {
+  id: string;
+  nome: string;
+  valor_atual: number;
+  valor_meta: number;
+  prazo: string | null;
+};
+
+export type CriarMetaArgs = {
+  nome: string;
+  valor_meta: number;
+  prazo: string;
+};
+
+export type AdicionarAporteMetaArgs = {
+  nome_meta: string;
+  valor: number;
+};
+
 export type MensagemHistorico = {
   role: "user" | "assistant";
   content: string;
