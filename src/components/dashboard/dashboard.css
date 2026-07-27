@@ -888,3 +888,150 @@ button, input { font: inherit; }
   color: #b89cff;
   transform: translate(2px, -52%);
 }
+
+.sidebar-user-link {
+  display: block;
+  margin-top: auto;
+  color: inherit;
+  text-decoration: none;
+}
+
+.sidebar-user-card {
+  width: 100%;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.018);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.sidebar-user-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(139, 92, 246, 0.28);
+  background: rgba(139, 92, 246, 0.07);
+}
+
+.sidebar-user-avatar {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-user-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #9d74ff, #6d28d9);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.sidebar-user-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.sidebar-user-content strong,
+.sidebar-user-content span {
+  display: block;
+}
+
+.sidebar-user-content strong {
+  overflow: hidden;
+  color: #f6f2fa;
+  font-size: 13px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-user-content span {
+  margin-top: 4px;
+  color: #8f859b;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.sidebar-user-arrow {
+  flex: 0 0 auto;
+  color: #746b80;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sidebar-user-card:hover .sidebar-user-arrow {
+  color: #b99cff;
+  transform: translateX(2px);
+}
+
+.sidebar-user-link {
+  margin-top: auto;
+}
+
+.sidebar-user-card {
+  min-height: 76px;
+  padding: 12px;
+  gap: 12px;
+}
+
+.sidebar-user-avatar {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border-radius: 16px;
+}
+
+.sidebar-user-content strong {
+  font-size: 14px;
+}
+
+.sidebar-user-content span {
+  margin-top: 5px;
+  color: #a98bff;
+  font-size: 11.5px;
+}
+
+.sidebar-user-arrow {
+  margin-left: auto;
+}
+
+
+.soraia-sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
+.soraia-sidebar__nav {
+  flex: 0 0 auto;
+}
+
+.sidebar-user-link {
+  margin-top: auto !important;
+  padding-top: 24px;
+}
+
+.sidebar-user-card {
+  width: 100%;
+  min-height: 76px;
+  padding: 12px;
+}
+
+.sidebar-user-content strong {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

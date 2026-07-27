@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import UserProfileCard from "@/components/dashboard/UserProfileCard";
+import Link from "next/link";
 type SidebarProps = {
   collapsed: boolean;
   onToggle: () => void;
@@ -126,19 +127,11 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         })}
       </nav>
 
-      <div className="soraia-sidebar__profile">
-        <div className="soraia-sidebar__avatar">RA</div>
-        
-<Link href="/perfil" className="sidebar-profile-link">
-  <div className="sidebar-profile-card">
-    <strong>Rafael Aguiar</strong>
-          <span>Soraia Pro</span>
-    <span className="sidebar-profile-arrow">›</span>
-  </div>
-</Link>
-      </div>
+      
     
   
+
+      <UserProfileCard />
 </aside>
 
   );
