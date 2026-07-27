@@ -31,7 +31,10 @@ function resumirTransacoes(transactions: Transaction[]) {
         item.tipo === "receita" &&
         item.status === "recebido",
     )
-    .reduce((total, item) => total + Number(item.valor), 0);
+    .reduce(
+      (total, item) => total + Number(item.valor),
+      0,
+    );
 
   const despesasPagas = transactions
     .filter(
@@ -39,7 +42,10 @@ function resumirTransacoes(transactions: Transaction[]) {
         item.tipo === "despesa" &&
         item.status === "pago",
     )
-    .reduce((total, item) => total + Number(item.valor), 0);
+    .reduce(
+      (total, item) => total + Number(item.valor),
+      0,
+    );
 
   const receitasPendentes = transactions
     .filter(
@@ -47,7 +53,10 @@ function resumirTransacoes(transactions: Transaction[]) {
         item.tipo === "receita" &&
         item.status === "pendente",
     )
-    .reduce((total, item) => total + Number(item.valor), 0);
+    .reduce(
+      (total, item) => total + Number(item.valor),
+      0,
+    );
 
   const despesasPendentes = transactions
     .filter(
@@ -55,7 +64,10 @@ function resumirTransacoes(transactions: Transaction[]) {
         item.tipo === "despesa" &&
         item.status === "pendente",
     )
-    .reduce((total, item) => total + Number(item.valor), 0);
+    .reduce(
+      (total, item) => total + Number(item.valor),
+      0,
+    );
 
   return {
     saldo_atual: receitasRecebidas - despesasPagas,
@@ -77,7 +89,7 @@ const tools = [
     type: "function" as const,
     name: "registrar_transacao",
     description:
-      "Registra uma ou mais receitas ou despesas financeiras. Pode ser chamada várias vezes quando a mensagem contém várias transações.",
+      "Registra imediatamente uma receita ou despesa quando o usuário informa uma movimentação financeira com valor. Pode ser chamada várias vezes quando houver várias transações na mesma mensagem.",
     strict: true,
     parameters: {
       type: "object",
@@ -86,29 +98,34 @@ const tools = [
         tipo: {
           type: "string",
           enum: ["receita", "despesa"],
+          description:
+            "Use despesa para dinheiro gasto ou a pagar. Use receita para dinheiro recebido ou a receber.",
         },
         descricao: {
           type: "string",
           description:
-            "Descrição curta, como Mercado, Gasolina, Salário ou PIX do João.",
+            "Descrição curta e clara da movimentação, como Mercado, Uber, Gasolina, Aluguel, Salário ou PIX do João.",
         },
         valor: {
           type: "number",
           description:
-            "Valor positivo, sem símbolo de moeda.",
+            "Valor positivo da movimentação, sem símbolo de moeda.",
         },
         categoria: {
           type: "string",
           description:
-            "Categoria adequada: Alimentação, Moradia, Transporte, Saúde, Lazer, Salário, Vendas, Investimentos ou Outros.",
+            "Categoria inferida automaticamente. Exemplos: Mercado, Alimentação, Transporte, Combustível, Moradia, Saúde, Educação, Lazer, Assinaturas, Contas, Salário, Vendas, Investimentos ou Outros.",
         },
         data: {
           type: "string",
-          description: "Data no formato YYYY-MM-DD.",
+          description:
+            "Data no formato YYYY-MM-DD. Quando o usuário não informar uma data, use a data atual.",
         },
         status: {
           type: "string",
           enum: ["pendente", "pago", "recebido"],
+          description:
+            "Use pago para despesas já realizadas, recebido para receitas já recebidas e pendente apenas para valores futuros.",
         },
       },
       required: [
@@ -123,13 +140,67 @@ const tools = [
   },
 ];
 
+function criarConfirmacao(
+  transacoes: RegistrarTransacaoArgs[],
+) {
+  if (transacoes.length === 0) {
+    return "";
+  }
+
+  if (transacoes.length === 1) {
+    const item = transacoes[0];
+
+    if (item.tipo === "despesa") {
+      const situacao =
+        item.status === "pendente"
+          ? "como pendente"
+          : "como paga";
+
+      return `Pronto! Registrei uma despesa de ${moeda(
+        Number(item.valor),
+      )} em ${item.descricao}, na categoria ${
+        item.categoria
+      }, ${situacao}. ✅`;
+    }
+
+    const situacao =
+      item.status === "pendente"
+        ? "como pendente"
+        : "como recebida";
+
+    return `Pronto! Registrei uma receita de ${moeda(
+      Number(item.valor),
+    )} referente a ${item.descricao}, na categoria ${
+      item.categoria
+    }, ${situacao}. ✅`;
+  }
+
+  const linhas = transacoes.map((item) => {
+    const tipo =
+      item.tipo === "despesa"
+        ? "Despesa"
+        : "Receita";
+
+    return `• ${tipo}: ${moeda(
+      Number(item.valor),
+    )} — ${item.descricao} (${item.categoria})`;
+  });
+
+  return `Pronto! Registrei ${
+    transacoes.length
+  } movimentações:\n\n${linhas.join("\n")} ✅`;
+}
+
 export async function processarMensagem(
   params: ProcessarMensagemParams,
 ): Promise<ResultadoProcessamento> {
-  const { mensagem, userId, origem, supabase } = params;
+  const { mensagem, userId, origem, supabase } =
+    params;
 
   if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY não configurada.");
+    throw new Error(
+      "OPENAI_API_KEY não configurada.",
+    );
   }
 
   const texto = mensagem.trim();
@@ -140,13 +211,21 @@ export async function processarMensagem(
 
   const { data, error } = await supabase
     .from("transactions")
-    .select("tipo, descricao, valor, categoria, data, status")
+    .select(
+      "tipo, descricao, valor, categoria, data, status",
+    )
     .eq("user_id", userId)
     .order("data", { ascending: true });
 
   if (error) {
-    console.error("Erro ao carregar transações:", error);
-    throw new Error("Não foi possível carregar os dados financeiros.");
+    console.error(
+      "Erro ao carregar transações:",
+      error,
+    );
+
+    throw new Error(
+      "Não foi possível carregar os dados financeiros.",
+    );
   }
 
   const transactions = (data ?? []) as Transaction[];
@@ -157,41 +236,118 @@ export async function processarMensagem(
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  const primeiraResposta = await openai.responses.create({
-    model: "gpt-5-mini",
-    store: false,
-    instructions: `
-Você é a Soraia, uma assistente financeira pessoal brasileira.
+  const primeiraResposta =
+    await openai.responses.create({
+      model: "gpt-5-mini",
+      store: false,
+      instructions: `
+Você é a Soraia, uma assistente financeira pessoal brasileira inteligente, objetiva e proativa.
 
 Data atual no Brasil: ${hoje}.
 Origem desta mensagem: ${origem}.
 
-Você conversa, analisa finanças e registra receitas e despesas.
+Sua principal função é interpretar linguagem natural, analisar as finanças do usuário e registrar receitas e despesas sem fazer perguntas desnecessárias.
 
-REGRAS OBRIGATÓRIAS:
-- Quando o usuário afirmar que gastou, pagou ou comprou algo, registre uma despesa.
-- Quando afirmar que recebeu, ganhou, vendeu ou entrou dinheiro, registre uma receita.
-- "Gastei", "paguei" e "comprei" indicam status "pago".
-- "Recebi", "entrou um PIX" e "caiu o salário" indicam status "recebido".
-- Algo que ainda será pago ou recebido deve ficar "pendente".
+REGRA PRINCIPAL:
+Quando a mensagem informar uma movimentação financeira real e contiver um valor, execute imediatamente a ferramenta registrar_transacao.
+
+NÃO peça confirmação antes de registrar.
+
+NÃO pergunte categoria quando ela puder ser inferida.
+
+NÃO pergunte se já foi pago quando o verbo indicar uma ação já realizada.
+
+NÃO pergunte novamente um valor que já aparece na mensagem.
+
+INFERÊNCIA DE TIPO E STATUS:
+- "gastei", "paguei", "comprei", "abasteci", "saquei" e "debitaram" = despesa com status "pago".
+- "recebi", "ganhei", "vendi", "caiu", "entrou", "depositaram" e "recebi um PIX" = receita com status "recebido".
+- "vou pagar", "preciso pagar", "vence", "conta para pagar" e "a pagar" = despesa com status "pendente".
+- "vou receber", "tenho para receber" e "a receber" = receita com status "pendente".
+- Só use "pendente" quando a mensagem indicar claramente uma movimentação futura ou ainda não realizada.
+
+INFERÊNCIA DE DATA:
 - Quando não houver data, use ${hoje}.
-- Entenda números falados ou transcritos, como "trinta e cinco", "mil e duzentos" e "quarenta e nove e noventa".
-- Converta corretamente formatos brasileiros: "1.500" pode representar 1500 e "49,90" representa 49.90.
-- Uma mensagem pode conter várias transações. Chame registrar_transacao uma vez para cada uma.
-- Exemplo: "gastei 35 no mercado e 180 no posto" deve gerar duas despesas.
-- Não registre simulações, perguntas ou exemplos.
-- Não invente valor, descrição ou data.
-- Quando faltar um valor essencial, faça uma pergunta curta.
-- Não diga que registrou algo sem executar a ferramenta.
-- Responda em português do Brasil, de forma objetiva e acolhedora.
+- "hoje" = ${hoje}.
+- Interprete ontem, amanhã, dias da semana e datas faladas considerando a data atual.
+- Não pergunte a data quando ela não for informada; use hoje.
 
-DADOS FINANCEIROS:
+INFERÊNCIA DE CATEGORIA:
+- mercado, supermercado, atacado, açougue, feira e hortifrúti = Mercado.
+- restaurante, lanche, pizza, almoço, jantar, café, padaria, delivery e iFood = Alimentação.
+- Uber, 99, táxi, ônibus, metrô, passagem e estacionamento = Transporte.
+- gasolina, diesel, etanol, combustível e posto = Combustível.
+- aluguel, condomínio, IPTU, imóvel e prestação da casa = Moradia.
+- luz, água, gás, internet e telefone = Contas.
+- farmácia, remédio, médico, consulta, exame e hospital = Saúde.
+- escola, faculdade, curso e material escolar = Educação.
+- Netflix, Spotify, assinatura, aplicativo e mensalidade digital = Assinaturas.
+- cinema, festa, jogo, passeio e entretenimento = Lazer.
+- salário, pagamento do trabalho e pró-labore = Salário.
+- venda, cliente e serviço prestado = Vendas.
+- investimento, aplicação e rendimento = Investimentos.
+- Quando nenhuma categoria específica servir, use Outros.
+
+DESCRIÇÃO:
+- Use uma descrição curta baseada no estabelecimento, item ou finalidade.
+- "Gastei 35 no mercado" deve usar descrição "Mercado" e categoria "Mercado".
+- "Uber 22" deve usar descrição "Uber" e categoria "Transporte".
+- "Abasteci 100" deve usar descrição "Combustível" e categoria "Combustível".
+- "iFood 65" deve usar descrição "iFood" e categoria "Alimentação".
+
+VALORES:
+- Entenda números escritos em algarismos ou por extenso.
+- "trinta e cinco" = 35.
+- "mil e duzentos" = 1200.
+- "quarenta e nove e noventa" = 49,90.
+- "1.500" em contexto brasileiro normalmente significa 1500.
+- "49,90" significa 49.90.
+- Nunca pergunte o valor quando ele já estiver explícito ou puder ser claramente interpretado.
+
+VÁRIAS TRANSAÇÕES:
+- Uma mensagem pode conter várias movimentações.
+- Chame registrar_transacao uma vez para cada movimentação.
+- "Gastei 35 no mercado e 180 no posto" gera duas chamadas.
+
+QUANDO PERGUNTAR:
+- Pergunte somente quando faltar o valor da movimentação.
+- Exemplo: "Paguei o mercado" → pergunte apenas "Qual foi o valor?".
+- Caso seja impossível saber se é receita ou despesa, faça uma pergunta curta.
+- Não pergunte categoria, status ou data quando puder usar as regras acima.
+
+NÃO REGISTRAR:
+- Não registre perguntas, hipóteses, simulações ou exemplos.
+- "Posso gastar R$ 500?" é uma pergunta, não uma despesa.
+- "Se eu comprar algo por R$ 100" é uma simulação.
+- "Quanto gastei no mercado?" é uma consulta.
+
+EXEMPLOS OBRIGATÓRIOS:
+Usuário: "Gastei 35 reais no mercado."
+Ação: registrar despesa de 35, descrição Mercado, categoria Mercado, data ${hoje}, status pago.
+
+Usuário: "Paguei 120 de internet."
+Ação: registrar despesa de 120, descrição Internet, categoria Contas, data ${hoje}, status pago.
+
+Usuário: "Recebi 1.500 do cliente."
+Ação: registrar receita de 1500, descrição Pagamento de cliente, categoria Vendas, data ${hoje}, status recebido.
+
+Usuário: "Vou pagar 800 de aluguel amanhã."
+Ação: registrar despesa de 800, descrição Aluguel, categoria Moradia, data de amanhã, status pendente.
+
+Usuário: "Comprei no mercado."
+Resposta: perguntar somente o valor.
+
+Nunca diga que uma transação foi registrada sem executar registrar_transacao.
+
+Responda sempre em português do Brasil.
+
+DADOS FINANCEIROS DO USUÁRIO:
 ${JSON.stringify(resumo)}
-    `,
-    input: texto,
-    tools,
-    tool_choice: "auto",
-  });
+      `,
+      input: texto,
+      tools,
+      tool_choice: "auto",
+    });
 
   const chamadas = primeiraResposta.output.filter(
     (item) =>
@@ -209,13 +365,8 @@ ${JSON.stringify(resumo)}
     };
   }
 
-  const resultadosFerramentas: Array<{
-    type: "function_call_output";
-    call_id: string;
-    output: string;
-  }> = [];
-
-  const transacoesRegistradas: RegistrarTransacaoArgs[] = [];
+  const transacoesRegistradas: RegistrarTransacaoArgs[] =
+    [];
 
   for (const chamada of chamadas) {
     if (
@@ -231,16 +382,11 @@ ${JSON.stringify(resumo)}
       argumentos = JSON.parse(
         chamada.arguments,
       ) as RegistrarTransacaoArgs;
-    } catch {
-      resultadosFerramentas.push({
-        type: "function_call_output",
-        call_id: chamada.call_id,
-        output: JSON.stringify({
-          sucesso: false,
-          erro: "Dados inválidos.",
-        }),
-      });
-
+    } catch (erro) {
+      console.error(
+        "Argumentos inválidos da ferramenta:",
+        erro,
+      );
       continue;
     }
 
@@ -252,55 +398,31 @@ ${JSON.stringify(resumo)}
     });
 
     if (resultado.sucesso) {
-      transacoesRegistradas.push(resultado.transacao);
+      transacoesRegistradas.push(
+        resultado.transacao,
+      );
+    } else {
+      console.error(
+        "Erro ao registrar transação:",
+        resultado,
+      );
     }
-
-    resultadosFerramentas.push({
-      type: "function_call_output",
-      call_id: chamada.call_id,
-      output: JSON.stringify(resultado),
-    });
   }
 
-  const respostaFinal = await openai.responses.create({
-    model: "gpt-5-mini",
-    store: false,
-    instructions: `
-Você é a Soraia.
-
-Confirme de forma curta e clara as ações realizadas.
-Responda em português do Brasil.
-Formate dinheiro como R$ 35,00.
-Quando houver várias transações, mostre uma linha para cada uma.
-Não afirme que algo foi salvo quando o resultado indicar erro.
-Não repita explicações longas.
-    `,
-    input: [
-      ...primeiraResposta.output,
-      ...resultadosFerramentas,
-    ] as OpenAI.Responses.ResponseInput,
-    tools,
-  });
-
-  let resposta = respostaFinal.output_text;
-
-  if (!resposta && transacoesRegistradas.length === 1) {
-    const item = transacoesRegistradas[0];
-
-    resposta =
-      item.tipo === "despesa"
-        ? `Pronto! Registrei a despesa de ${moeda(item.valor)} em ${item.descricao}.`
-        : `Pronto! Registrei a receita de ${moeda(item.valor)} referente a ${item.descricao}.`;
-  }
-
-  if (!resposta && transacoesRegistradas.length > 1) {
-    resposta = `Pronto! Registrei ${transacoesRegistradas.length} transações.`;
+  if (transacoesRegistradas.length === 0) {
+    return {
+      resposta:
+        "Entendi a movimentação, mas não consegui salvá-la. Tente novamente.",
+      acaoExecutada: false,
+      transacoes: [],
+    };
   }
 
   return {
-    resposta:
-      resposta || "Não consegui concluir essa solicitação.",
-    acaoExecutada: transacoesRegistradas.length > 0,
+    resposta: criarConfirmacao(
+      transacoesRegistradas,
+    ),
+    acaoExecutada: true,
     transacoes: transacoesRegistradas,
   };
 }
