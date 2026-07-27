@@ -24,6 +24,7 @@ export async function criarMeta(formData: FormData) {
   });
 
   revalidatePath("/painel");
+  revalidatePath("/painel/metas");
 }
 
 export async function criarAporte(metaId: string, formData: FormData) {

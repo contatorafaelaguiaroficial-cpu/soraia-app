@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ChevronLeft, Target, PiggyBank } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import NovoAporteForm from "@/components/NovoAporteForm";
-import { Card, CircularProgress, IconBadge, INK, MUTED } from "@/components/ui";
+import { Card, CircularProgress, INK, MUTED } from "@/components/ui";
 
 const PURPLE = "#8B5CF6";
 
@@ -48,7 +48,7 @@ export default async function MetaDetalhePage({ params }: { params: Promise<{ id
     <div className="min-h-screen" style={{ background: "#0F0C14", fontFamily: "'Nunito', sans-serif" }}>
       <header className="flex items-center gap-3 px-6 py-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         <Link
-          href="/painel"
+          href="/painel/metas"
           className="flex items-center justify-center rounded-2xl"
           style={{ width: 40, height: 40, background: "#1C1723", border: "1.5px solid rgba(255,255,255,0.09)" }}
         >
@@ -59,7 +59,23 @@ export default async function MetaDetalhePage({ params }: { params: Promise<{ id
 
       <main className="px-6 py-8 max-w-md mx-auto">
         <div className="flex flex-col items-center text-center mb-7">
-          <IconBadge icon={Target} size={54} tone="nectarine" />
+          <div
+            className="flex items-center justify-center rounded-2xl"
+            style={{
+              width: 54,
+              height: 54,
+              background:
+                "linear-gradient(155deg, #8B5CF6, #6D28D9)",
+              boxShadow:
+                "0 6px 14px rgba(109,40,217,0.32)",
+            }}
+          >
+            <Target
+              size={25}
+              color="#FFFFFF"
+              strokeWidth={2.2}
+            />
+          </div>
           <div className="mt-4" style={{ color: INK, fontWeight: 800, fontSize: 16 }}>{meta.nome}</div>
           <div className="mt-2" style={{ color: PURPLE, fontSize: 40, fontWeight: 900 }}>{pct}%</div>
 
@@ -99,7 +115,23 @@ export default async function MetaDetalhePage({ params }: { params: Promise<{ id
                 style={{ borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.08)" }}
               >
                 <div className="flex items-center gap-3">
-                  <IconBadge icon={PiggyBank} size={32} tone="mint" />
+                  <div
+                    className="flex items-center justify-center rounded-xl shrink-0"
+                    style={{
+                      width: 32,
+                      height: 32,
+                      background:
+                        "linear-gradient(155deg, #96C7B3, #6BA48D)",
+                      boxShadow:
+                        "0 5px 12px rgba(107,164,141,0.28)",
+                    }}
+                  >
+                    <PiggyBank
+                      size={15}
+                      color="#FFFFFF"
+                      strokeWidth={2.2}
+                    />
+                  </div>
                   <span style={{ color: INK, fontWeight: 700, fontSize: 13 }}>
                     {new Date(a.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long" })}
                   </span>
