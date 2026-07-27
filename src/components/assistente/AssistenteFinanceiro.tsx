@@ -185,13 +185,46 @@ export default function AssistenteFinanceiro() {
   }
 
   useEffect(() => {
+    if (mensagemInicialEnviadaRef.current) {
+      return;
+    }
+
     const mensagemInicial =
       searchParams.get("mensagem")?.trim() || "";
 
-    if (
-      !mensagemInicial ||
-      mensagemInicialEnviadaRef.current
-    ) {
+    const audioPergunta =
+      searchParams.get("audioPergunta")?.trim() || "";
+
+    const audioResposta =
+      searchParams.get("audioResposta")?.trim() || "";
+
+    if (audioPergunta && audioResposta) {
+      mensagemInicialEnviadaRef.current = true;
+
+      setMensagens((atual) => [
+        ...atual,
+        {
+          id: criarId(),
+          role: "user",
+          content: `🎤 ${audioPergunta}`,
+        },
+        {
+          id: criarId(),
+          role: "assistant",
+          content: audioResposta,
+        },
+      ]);
+
+      window.history.replaceState(
+        {},
+        "",
+        "/painel/assistente",
+      );
+
+      return;
+    }
+
+    if (!mensagemInicial) {
       return;
     }
 
