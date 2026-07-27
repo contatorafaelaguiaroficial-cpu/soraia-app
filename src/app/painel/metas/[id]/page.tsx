@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronLeft, Target, PiggyBank } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import NovoAporteForm from "@/components/NovoAporteForm";
+import MetaActions from "@/components/MetaActions";
 import { Card, CircularProgress, INK, MUTED } from "@/components/ui";
 
 const PURPLE = "#8B5CF6";
@@ -92,6 +93,12 @@ export default async function MetaDetalhePage({ params }: { params: Promise<{ id
             </span>
           </div>
         </div>
+
+        <MetaActions
+          metaId={meta.id}
+          nomeAtual={meta.nome}
+          valorAtual={Number(meta.valor_meta)}
+        />
 
         <NovoAporteForm metaId={meta.id} />
 
