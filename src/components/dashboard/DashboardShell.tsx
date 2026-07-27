@@ -15,54 +15,48 @@ export default function DashboardShell({
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(true);
-  const [ready, setReady] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 900px)");
 
-    function atualizarTela(event?: MediaQueryListEvent) {
-      const mobile = event ? event.matches : mediaQuery.matches;
+    const atualizar = () => {
+      setIsMobile(mediaQuery.matches);
 
-      setIsMobile(mobile);
-
-      if (mobile) {
+      if (mediaQuery.matches) {
         setCollapsed(false);
       }
+    };
 
-      setReady(true);
-    }
+    atualizar();
 
-    atualizarTela();
-
-    mediaQuery.addEventListener("change", atualizarTela);
+    mediaQuery.addEventListener("change", atualizar);
 
     return () => {
-      mediaQuery.removeEventListener("change", atualizarTela);
+      mediaQuery.removeEventListener("change", atualizar);
     };
   }, []);
 
   return (
     <div
-      className={[
-        "soraia-dashboard",
-        collapsed && !isMobile ? "soraia-dashboard--collapsed" : "",
-        isMobile ? "soraia-dashboard--mobile" : "",
-        ready ? "soraia-dashboard--ready" : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={`soraia-dashboard ${
+        collapsed && isMobile === false
+          ? "soraia-dashboard--collapsed"
+          : ""
+      }`}
     >
-      {!isMobile && (
+      {isMobile === false && (
         <Sidebar
           collapsed={collapsed}
           onToggle={() => setCollapsed((value) => !value)}
         />
       )}
 
-      <main className="soraia-dashboard__main">{children}</main>
+      <main className="soraia-dashboard__main">
+        {children}
+      </main>
 
-      <AssistantDock collapsed={isMobile ? false : collapsed} />
+      <AssistantDock collapsed={isMobile === false && collapsed} />
 
       <MobileNavigation />
     </div>

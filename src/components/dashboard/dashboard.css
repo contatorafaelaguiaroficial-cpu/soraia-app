@@ -1309,3 +1309,28 @@ body {
     display: none !important;
   }
 }
+
+/* REMOVE COMPLETAMENTE A SIDEBAR NO CELULAR */
+@media (max-width: 900px) {
+  .soraia-dashboard {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 100dvh !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .soraia-sidebar,
+  aside.soraia-sidebar,
+  .soraia-sidebar__toggle {
+    display: none !important;
+  }
+
+  .soraia-dashboard__main {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+  }
+}
