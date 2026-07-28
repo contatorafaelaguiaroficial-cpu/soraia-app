@@ -49,6 +49,35 @@ function formatarTempo(segundos: number) {
   ).padStart(2, "0")}`;
 }
 
+function mensagemDeBloqueio(resultado: {
+  codigo?: string;
+  resposta?: string;
+  erro?: string;
+  error?: string;
+}) {
+  if (resultado.codigo === "LIMITE_FREE_ATINGIDO") {
+    return (
+      "Você usou as 10 mensagens mensais do plano Free. " +
+      "No Soraia Pro, você continua conversando sem esse limite. " +
+      "Acesse Perfil > Assinatura para fazer o upgrade."
+    );
+  }
+
+  if (resultado.codigo === "AUDIO_EXCLUSIVO_PRO") {
+    return (
+      "As mensagens por áudio são exclusivas do Soraia Pro. " +
+      "Acesse Perfil > Assinatura para liberar conversas por voz."
+    );
+  }
+
+  return (
+    resultado.resposta ||
+    resultado.erro ||
+    resultado.error ||
+    "Não foi possível concluir esta solicitação."
+  );
+}
+
 export default function AssistenteFinanceiro() {
   const searchParams = useSearchParams();
   const mensagemInicialEnviadaRef = useRef(false);
@@ -156,11 +185,10 @@ export default function AssistenteFinanceiro() {
       const resultado = await resposta.json();
 
       if (!resposta.ok) {
-        throw new Error(
-          resultado.erro ||
-            resultado.error ||
-            "Não foi possível obter uma resposta.",
+        adicionarErro(
+          mensagemDeBloqueio(resultado),
         );
+        return;
       }
 
       setMensagens((atual) => [
@@ -441,12 +469,10 @@ export default function AssistenteFinanceiro() {
       const resultado = await resposta.json();
 
       if (!resposta.ok) {
-        throw new Error(
-          resultado.erro ||
-            resultado.error ||
-            resultado.resposta ||
-            "Não foi possível processar o áudio.",
+        adicionarErro(
+          mensagemDeBloqueio(resultado),
         );
+        return;
       }
 
       const transcricao = String(
