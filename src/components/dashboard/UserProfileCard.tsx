@@ -8,12 +8,14 @@ import { createClient } from "@/lib/supabase/client";
 type UsuarioCard = {
   nome: string;
   avatar: string | null;
+  plano: "free" | "pro";
 };
 
 export default function UserProfileCard() {
   const [usuario, setUsuario] = useState<UsuarioCard>({
     nome: "Usuário",
     avatar: null,
+    plano: "free",
   });
 
   useEffect(() => {
@@ -39,9 +41,21 @@ export default function UserProfileCard() {
         user.user_metadata?.picture ||
         null;
 
+      const { data: perfil } = await supabase
+        .from("profiles")
+        .select("plano")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (!ativo) return;
+
       setUsuario({
         nome: nomeCompleto,
         avatar,
+        plano:
+          perfil?.plano === "pro"
+            ? "pro"
+            : "free",
       });
     }
 
@@ -71,7 +85,11 @@ export default function UserProfileCard() {
 
         <div className="sidebar-user-content">
           <strong>{usuario.nome.split(' ')[0]}</strong>
-          <span>Plano Free</span>
+          <span>
+            {usuario.plano === "pro"
+              ? "Plano Pro"
+              : "Plano Free"}
+          </span>
         </div>
 
         <ChevronRight

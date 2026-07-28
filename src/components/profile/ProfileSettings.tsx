@@ -24,11 +24,15 @@ import { createClient } from "@/lib/supabase/client";
 type ProfileSettingsProps = {
   nomeInicial: string;
   email: string;
+  plano: "free" | "pro";
+  statusAssinatura: string;
 };
 
 export default function ProfileSettings({
   nomeInicial,
   email,
+  plano,
+  statusAssinatura,
 }: ProfileSettingsProps) {
   const router = useRouter();
 
@@ -280,14 +284,24 @@ export default function ProfileSettings({
               </div>
 
               <div className="profile-row-content">
-                <strong>Plano Soraia Free</strong>
+                <strong>
+                  {plano === "pro"
+                    ? "Plano Soraia Pro"
+                    : "Plano Soraia Free"}
+                </strong>
                 <span>
-                  Assinaturas pagas estarão disponíveis futuramente
+                  {plano === "pro"
+                    ? statusAssinatura === "active"
+                      ? "Sua assinatura está ativa"
+                      : "Confira o status da sua assinatura"
+                    : "Você está usando o plano gratuito"}
                 </span>
               </div>
 
               <span className="profile-coming-soon">
-                Em breve
+                {plano === "pro"
+                  ? "Ativo"
+                  : "Free"}
               </span>
             </div>
           </div>

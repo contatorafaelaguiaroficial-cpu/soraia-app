@@ -10,6 +10,22 @@ export default async function PerfilPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data: perfil } = user
+    ? await supabase
+        .from("profiles")
+        .select("plano, status_assinatura")
+        .eq("id", user.id)
+        .maybeSingle()
+    : { data: null };
+
+  const plano =
+    perfil?.plano === "pro"
+      ? "pro"
+      : "free";
+
+  const statusAssinatura =
+    perfil?.status_assinatura || "inactive";
+
   const nome =
     user?.user_metadata?.full_name ||
     user?.user_metadata?.name ||
@@ -60,13 +76,19 @@ export default async function PerfilPage() {
           </div>
 
           <div className="profile-plan">
-            <span>Soraia Free</span>
+            <span>
+              {plano === "pro"
+                ? "Soraia Pro"
+                : "Soraia Free"}
+            </span>
           </div>
         </section>
 
         <ProfileSettings
           nomeInicial={nome}
           email={email}
+          plano={plano}
+          statusAssinatura={statusAssinatura}
         />
 
         <section className="profile-danger-zone">
