@@ -260,9 +260,9 @@ export const StaticAd: React.FC = () => {
         style={{
           position: "absolute",
           right: 6,
-          top: 350,
+          top: 168,
           width: 546,
-          height: 1000,
+          height: 1182,
           borderRadius: "56px 56px 0 0",
           padding: 2,
           background: "linear-gradient(160deg, rgba(255,255,255,0.28), rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.10))",
@@ -410,6 +410,25 @@ export const StaticAd: React.FC = () => {
                   Notei que você gastou <span style={{ color: c.gold, fontWeight: 700 }}>23% a mais</span> em
                   delivery esse mês 👀
                 </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", marginTop: 14 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  background: "rgba(169,140,255,0.10)",
+                  border: "1px solid rgba(169,140,255,0.20)",
+                  borderRadius: 20,
+                  borderTopLeftRadius: 4,
+                  padding: "14px 18px",
+                }}
+              >
+                <div style={{ width: 6, height: 6, borderRadius: 6, background: c.faint }} />
+                <div style={{ width: 6, height: 6, borderRadius: 6, background: c.faint, opacity: 0.6 }} />
+                <div style={{ width: 6, height: 6, borderRadius: 6, background: c.faint, opacity: 0.3 }} />
               </div>
             </div>
           </div>
