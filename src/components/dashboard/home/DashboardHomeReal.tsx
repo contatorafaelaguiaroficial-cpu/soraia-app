@@ -88,6 +88,27 @@ export default function DashboardHomeReal(props: Props) {
 
   return (
     <main className="real-dashboard">
+      <Link
+        href="/perfil"
+        className="real-mobile-plan"
+      >
+        <div className="real-mobile-plan__identity">
+          <span className="real-mobile-plan__icon">
+            <Sparkles size={15} />
+          </span>
+
+          <div>
+            <small>PLANO ATUAL</small>
+            <strong>Soraia Free</strong>
+          </div>
+        </div>
+
+        <span className="real-mobile-plan__action">
+          Ver plano
+          <ArrowRight size={14} />
+        </span>
+      </Link>
+
       <section className="real-dashboard-hero">
         <div className="real-dashboard-hero-content">
           <span className="real-dashboard-eyebrow">

@@ -1397,3 +1397,107 @@ body {
       0 0 26px rgba(255, 74, 94, 0.32);
   }
 }
+
+
+/* =========================================================
+   ESTRUTURA MOBILE COMPACTA
+   Evita padding duplo e libera mais área útil.
+   ========================================================= */
+
+@media (max-width: 720px) {
+  .soraia-dashboard__main {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding:
+      0
+      0
+      calc(145px + env(safe-area-inset-bottom))
+      !important;
+  }
+
+  .soraia-topbar {
+    margin-bottom: 10px !important;
+  }
+
+  .soraia-dock,
+  .soraia-dock--collapsed {
+    left: 12px !important;
+    right: 12px !important;
+    bottom:
+      calc(
+        65px + env(safe-area-inset-bottom)
+      ) !important;
+    min-height: 54px !important;
+    border-radius: 17px !important;
+  }
+
+  .soraia-mobile-nav {
+    min-height:
+      calc(
+        60px + env(safe-area-inset-bottom)
+      ) !important;
+    padding-bottom:
+      env(safe-area-inset-bottom) !important;
+  }
+}
+
+@media (max-width: 350px) {
+  .soraia-dock,
+  .soraia-dock--collapsed {
+    left: 10px !important;
+    right: 10px !important;
+  }
+}
+
+/* =========================================================
+   DOCK MOBILE MAIS LEVE E SEM COBRIR TANTO CONTEÚDO
+   ========================================================= */
+
+@media (max-width: 720px) {
+  .soraia-dock,
+  .soraia-dock--collapsed {
+    left: 10px !important;
+    right: 10px !important;
+    bottom:
+      calc(
+        61px + env(safe-area-inset-bottom)
+      ) !important;
+    min-height: 50px !important;
+    border-radius: 16px !important;
+  }
+
+  .soraia-dock input {
+    min-width: 0 !important;
+    font-size: 12px !important;
+  }
+
+  .soraia-dock__microphone {
+    width: 38px !important;
+    height: 38px !important;
+    flex: 0 0 38px !important;
+  }
+
+  .soraia-mobile-nav {
+    min-height:
+      calc(
+        57px + env(safe-area-inset-bottom)
+      ) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .soraia-dock,
+  .soraia-dock--collapsed {
+    left: 14px !important;
+    right: 14px !important;
+  }
+}
+
+@media (max-width: 350px) {
+  .soraia-dock,
+  .soraia-dock--collapsed {
+    left: 12px !important;
+    right: 12px !important;
+  }
+}

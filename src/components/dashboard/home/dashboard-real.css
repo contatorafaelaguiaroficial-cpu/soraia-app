@@ -630,3 +630,473 @@
 .real-insight-informativo svg {
   flex-shrink: 0;
 }
+
+
+/* =========================================================
+   DASHBOARD MOBILE COMPACTO
+   Mantém a identidade atual e reduz a escala de tablet.
+   ========================================================= */
+
+.real-mobile-plan {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .real-dashboard {
+    width: 100%;
+    max-width: 100%;
+    padding:
+      12px
+      12px
+      calc(150px + env(safe-area-inset-bottom));
+  }
+
+  .real-mobile-plan {
+    width: 100%;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 9px 11px;
+    border: 1px solid rgba(184, 151, 255, 0.2);
+    border-radius: 17px;
+    background:
+      linear-gradient(
+        135deg,
+        rgba(139, 92, 246, 0.12),
+        rgba(139, 92, 246, 0.035)
+      ),
+      #15111b;
+    color: #f7f3fb;
+    text-decoration: none;
+  }
+
+  .real-mobile-plan__identity {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .real-mobile-plan__icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background:
+      linear-gradient(
+        145deg,
+        #9d74ff,
+        #6d28d9
+      );
+    color: #ffffff;
+    box-shadow:
+      0 7px 18px
+      rgba(109, 40, 217, 0.3);
+  }
+
+  .real-mobile-plan__identity small,
+  .real-mobile-plan__identity strong {
+    display: block;
+  }
+
+  .real-mobile-plan__identity small {
+    margin-bottom: 2px;
+    color: #8f8599;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.13em;
+  }
+
+  .real-mobile-plan__identity strong {
+    overflow: hidden;
+    color: #eee8f4;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .real-mobile-plan__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #b997ff;
+    font-size: 10px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .real-dashboard-hero {
+    display: block;
+    min-height: 0;
+    padding: 20px 18px;
+    border-radius: 22px;
+  }
+
+  .real-dashboard-hero::before {
+    top: -180px;
+    left: 65%;
+    width: 125px;
+    height: 520px;
+  }
+
+  .real-dashboard-eyebrow {
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 8px;
+  }
+
+  .real-dashboard-hero h1 {
+    max-width: 100%;
+    font-size: clamp(30px, 10vw, 38px);
+    line-height: 1.03;
+    letter-spacing: -0.055em;
+  }
+
+  .real-dashboard-hero p {
+    margin-top: 14px;
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .real-dashboard-actions {
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .real-dashboard-primary,
+  .real-dashboard-secondary {
+    min-height: 42px;
+    padding: 0 14px;
+    border-radius: 12px;
+    font-size: 11px;
+  }
+
+  /*
+   * A órbita continua no desktop e tablet.
+   * No celular, as mesmas informações já aparecem
+   * nos cards de saldo e previsão financeira.
+   */
+  .real-balance-orbit {
+    display: none;
+  }
+
+  .real-dashboard-metrics {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin: 11px 0;
+  }
+
+  .real-dashboard-metrics article {
+    min-width: 0;
+    min-height: 86px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .real-metric-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    border-radius: 11px;
+  }
+
+  .real-metric-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .real-dashboard-metrics article > div:last-child {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .real-dashboard-metrics span {
+    margin-bottom: 3px;
+    font-size: 8.5px;
+    line-height: 1.25;
+  }
+
+  .real-dashboard-metrics strong {
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .real-dashboard-grid {
+    gap: 11px;
+  }
+
+  .real-dashboard-card {
+    padding: 17px;
+    border-radius: 19px;
+  }
+
+  .real-card-header {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .real-card-header span {
+    margin-bottom: 5px;
+    font-size: 8px;
+  }
+
+  .real-card-header h2 {
+    font-size: 17px;
+    line-height: 1.25;
+  }
+
+  .real-card-header > svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .real-forecast-value {
+    margin-bottom: 17px;
+  }
+
+  .real-forecast-value span {
+    margin-bottom: 5px;
+    font-size: 10px;
+  }
+
+  .real-forecast-value strong {
+    font-size: 31px;
+  }
+
+  .real-forecast-lines > div {
+    gap: 12px;
+    padding: 10px 0;
+  }
+
+  .real-forecast-lines span {
+    font-size: 10px;
+  }
+
+  .real-forecast-lines strong {
+    font-size: 11px;
+  }
+
+  .real-next-commitment {
+    gap: 10px;
+    padding: 13px;
+    border-radius: 14px;
+  }
+
+  .real-next-icon {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .real-next-content strong {
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+
+  .real-next-content span {
+    font-size: 9px;
+  }
+
+  .real-next-commitment > strong {
+    font-size: 10px;
+  }
+
+  .real-card-link {
+    margin-top: 16px;
+    font-size: 10px;
+  }
+
+  .real-empty-state {
+    min-height: 100px;
+  }
+
+  .real-insight {
+    gap: 11px;
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .real-insight p {
+    font-size: 11.5px;
+    line-height: 1.55;
+  }
+
+  .real-commitment-row {
+    gap: 12px;
+    padding: 11px 0;
+  }
+}
+
+@media (max-width: 350px) {
+  .real-dashboard {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .real-dashboard-hero {
+    padding: 18px 15px;
+  }
+
+  .real-dashboard-hero h1 {
+    font-size: 29px;
+  }
+
+  .real-dashboard-secondary {
+    display: none;
+  }
+
+  .real-dashboard-primary {
+    width: 100%;
+  }
+
+  .real-dashboard-metrics article {
+    min-height: 82px;
+    padding: 11px;
+  }
+
+  .real-dashboard-metrics strong {
+    font-size: 13px;
+  }
+
+  .real-dashboard-card {
+    padding: 15px;
+  }
+}
+
+/* =========================================================
+   AJUSTE FINAL PARA CELULARES BAIXOS
+   ========================================================= */
+
+@media (max-width: 720px) {
+  .real-mobile-plan {
+    min-height: 50px;
+    margin-bottom: 9px;
+    padding: 7px 9px;
+    border-radius: 15px;
+  }
+
+  .real-mobile-plan__icon {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+    border-radius: 10px;
+  }
+
+  .real-mobile-plan__identity small {
+    font-size: 7px;
+  }
+
+  .real-mobile-plan__identity strong {
+    font-size: 11px;
+  }
+
+  .real-dashboard-hero {
+    padding: 17px 16px 16px;
+    border-radius: 20px;
+  }
+
+  .real-dashboard-eyebrow {
+    margin-bottom: 9px;
+  }
+
+  .real-dashboard-hero h1 {
+    font-size: clamp(28px, 9.3vw, 34px);
+    line-height: 1;
+  }
+
+  .real-dashboard-hero p {
+    margin-top: 11px;
+    font-size: 11.5px;
+    line-height: 1.45;
+  }
+
+  .real-dashboard-actions {
+    margin-top: 14px;
+  }
+
+  .real-dashboard-primary {
+    min-height: 39px;
+    font-size: 10.5px;
+  }
+
+  .real-dashboard-metrics {
+    margin-top: 9px;
+  }
+}
+
+@media (max-height: 650px) and (max-width: 720px) {
+  .real-mobile-plan {
+    min-height: 46px;
+  }
+
+  .real-dashboard-hero {
+    padding-top: 15px;
+    padding-bottom: 14px;
+  }
+
+  .real-dashboard-hero h1 {
+    font-size: 29px;
+  }
+
+  .real-dashboard-hero p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .real-dashboard-primary {
+    min-height: 37px;
+  }
+}
+
+/* =========================================================
+   ALINHAMENTO LATERAL MOBILE
+   ========================================================= */
+
+@media (max-width: 720px) {
+  .real-dashboard {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 14px;
+    padding-right: 14px;
+    margin: 0 auto;
+  }
+
+  .real-mobile-plan,
+  .real-dashboard-hero,
+  .real-dashboard-metrics,
+  .real-dashboard-grid {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .real-dashboard-metrics article,
+  .real-dashboard-card {
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 350px) {
+  .real-dashboard {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
