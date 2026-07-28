@@ -260,7 +260,7 @@ export const StaticAd: React.FC = () => {
         style={{
           position: "absolute",
           right: 6,
-          top: 636,
+          top: 350,
           width: 546,
           height: 1000,
           borderRadius: "56px 56px 0 0",
@@ -393,6 +393,25 @@ export const StaticAd: React.FC = () => {
               <CategoryRow icon={<Icon.Cart />} label="Mercado" amount="R$ 980" />
               <CategoryRow icon={<Icon.Car />} label="Transporte" amount="R$ 690" last />
             </div>
+
+            {/* proactive insight message, keeps the screen feeling alive */}
+            <div style={{ display: "flex", marginTop: 26 }}>
+              <div
+                style={{
+                  maxWidth: "82%",
+                  background: "rgba(169,140,255,0.10)",
+                  border: "1px solid rgba(169,140,255,0.20)",
+                  borderRadius: 20,
+                  borderTopLeftRadius: 4,
+                  padding: "16px 20px",
+                }}
+              >
+                <div style={{ fontFamily: fonts.body, fontSize: 16, lineHeight: 1.5, color: c.ink }}>
+                  Notei que você gastou <span style={{ color: c.gold, fontWeight: 700 }}>23% a mais</span> em
+                  delivery esse mês 👀
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* chat input */}
@@ -452,7 +471,7 @@ export const StaticAd: React.FC = () => {
         <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
           <Icon.Whatsapp />
           <span style={{ fontFamily: fonts.body, fontSize: 15, color: c.faint }}>
-            grátis para começar, direto no WhatsApp
+            sua assistente pessoal, 24 horas por dia
           </span>
         </div>
       </div>
