@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import { createClient } from "@/lib/supabase/server";
+import { obterAcessoSoraia } from "@/lib/assinatura/acesso";
 
 export const runtime = "nodejs";
 
@@ -34,6 +35,25 @@ export async function POST(request: Request) {
           erro: "Você precisa estar conectado para enviar áudios.",
         },
         { status: 401 },
+      );
+    }
+
+    const acesso = await obterAcessoSoraia({
+      supabase,
+      userId: user.id,
+    });
+
+    if (!acesso.proAtivo) {
+      return NextResponse.json(
+        {
+          erro:
+            "O envio de áudio é exclusivo do plano Soraia Pro.",
+          resposta:
+            "O recurso de áudio está disponível no Soraia Pro. Faça o upgrade para conversar por voz.",
+          codigo: "AUDIO_EXCLUSIVO_PRO",
+          plano: "free",
+        },
+        { status: 403 },
       );
     }
 
