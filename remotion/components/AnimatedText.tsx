@@ -16,7 +16,7 @@ export const AnimatedText: React.FC<{
 }> = ({
   lines,
   fontSize,
-  color = colors.white,
+  color = colors.ink,
   fontFamily = fonts.headline,
   align = "center",
   stagger = 6,

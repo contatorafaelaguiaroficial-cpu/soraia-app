@@ -3,16 +3,24 @@ import { colors } from "../theme";
 
 export const AmbientBackground: React.FC = () => {
   const frame = useCurrentFrame();
-  const x1 = 30 + Math.sin(frame / 90) * 20;
-  const y1 = 20 + Math.cos(frame / 110) * 15;
-  const x2 = 70 + Math.cos(frame / 100) * 20;
-  const y2 = 80 + Math.sin(frame / 130) * 15;
+  const x1 = 20 + Math.sin(frame / 90) * 18;
+  const y1 = 12 + Math.cos(frame / 110) * 10;
+  const x2 = 82 + Math.cos(frame / 100) * 14;
+  const y2 = 88 + Math.sin(frame / 130) * 10;
 
   return (
     <AbsoluteFill style={{ background: colors.bg }}>
       <AbsoluteFill
         style={{
-          background: `radial-gradient(circle at ${x1}% ${y1}%, rgba(169,140,255,0.35), transparent 45%), radial-gradient(circle at ${x2}% ${y2}%, rgba(243,197,109,0.18), transparent 40%)`,
+          background: `radial-gradient(circle at ${x1}% ${y1}%, rgba(124,58,237,0.14), transparent 45%), radial-gradient(circle at ${x2}% ${y2}%, rgba(243,197,109,0.20), transparent 42%)`,
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(124,58,237,0.09) 2px, transparent 2px)",
+          backgroundSize: "48px 48px",
+          opacity: 0.5,
         }}
       />
     </AbsoluteFill>

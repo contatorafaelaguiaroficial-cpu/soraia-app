@@ -1,6 +1,7 @@
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { colors } from "../theme";
 import { fonts } from "../fonts";
+import { VoiceOver, Sfx } from "../components/VoiceOver";
 
 export const TransitionScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -11,15 +12,20 @@ export const TransitionScene: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ background: colors.alert, alignItems: "center", justifyContent: "center" }}>
+      <Sfx file="whoosh.wav" delay={0} volume={0.55} />
+      <VoiceOver file="transition.wav" delay={5} />
       <div
         style={{
           fontFamily: fonts.headline,
-          fontSize: 120,
+          fontSize: 104,
           color: colors.white,
+          textAlign: "center",
+          lineHeight: 1.1,
           transform: `scale(${scale})`,
         }}
       >
-        ISSO ACABA.
+        <div>ISSO ACABA</div>
+        <div>AGORA.</div>
       </div>
       <AbsoluteFill style={{ background: "#ffffff", opacity: flash }} />
     </AbsoluteFill>

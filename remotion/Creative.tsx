@@ -9,14 +9,15 @@ import { DashboardScene } from "./scenes/DashboardScene";
 import { PunchScene } from "./scenes/PunchScene";
 import { CtaScene } from "./scenes/CtaScene";
 
+// Durations are sized around each scene's voice-over clip (lead-in + speech + tail).
 const scenes = [
-  { Component: HookScene, duration: 90 }, // 0:00 - 0:03
-  { Component: PainScene, duration: 90 }, // 0:03 - 0:06
-  { Component: TransitionScene, duration: 30 }, // 0:06 - 0:07
-  { Component: SolutionScene, duration: 120 }, // 0:07 - 0:11
-  { Component: DashboardScene, duration: 120 }, // 0:11 - 0:15
-  { Component: PunchScene, duration: 90 }, // 0:15 - 0:18
-  { Component: CtaScene, duration: 60 }, // 0:18 - 0:20
+  { Component: HookScene, duration: 106 },
+  { Component: PainScene, duration: 84 },
+  { Component: TransitionScene, duration: 55 },
+  { Component: SolutionScene, duration: 130 },
+  { Component: DashboardScene, duration: 125 },
+  { Component: PunchScene, duration: 99 },
+  { Component: CtaScene, duration: 103 },
 ];
 
 export const Creative: React.FC = () => {
