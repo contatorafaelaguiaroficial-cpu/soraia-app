@@ -25,6 +25,7 @@ type Mensagem = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  codigo?: string;
 };
 
 const perguntasRapidas = [
@@ -125,13 +126,17 @@ export default function AssistenteFinanceiro() {
     };
   }, []);
 
-  function adicionarErro(mensagem: string) {
+  function adicionarErro(
+    mensagem: string,
+    codigo?: string,
+  ) {
     setMensagens((atual) => [
       ...atual,
       {
         id: criarId(),
         role: "assistant",
         content: mensagem,
+        codigo,
       },
     ]);
   }
@@ -187,6 +192,7 @@ export default function AssistenteFinanceiro() {
       if (!resposta.ok) {
         adicionarErro(
           mensagemDeBloqueio(resultado),
+          resultado.codigo,
         );
         return;
       }
@@ -471,6 +477,7 @@ export default function AssistenteFinanceiro() {
       if (!resposta.ok) {
         adicionarErro(
           mensagemDeBloqueio(resultado),
+          resultado.codigo,
         );
         return;
       }
@@ -642,6 +649,24 @@ export default function AssistenteFinanceiro() {
                   </span>
 
                   <p>{mensagem.content}</p>
+
+                  {(mensagem.codigo ===
+                    "LIMITE_FREE_ATINGIDO" ||
+                    mensagem.codigo ===
+                      "AUDIO_EXCLUSIVO_PRO") && (
+                    <a
+                      href={
+                        process.env
+                          .NEXT_PUBLIC_CAKTO_CHECKOUT_URL
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="assistant-upgrade-button"
+                    >
+                      Assinar Soraia Pro
+                      <ArrowUp size={16} />
+                    </a>
+                  )}
                 </div>
               </article>
             ))}

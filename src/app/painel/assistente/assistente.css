@@ -556,3 +556,34 @@
     flex-basis: 42px;
   }
 }
+
+
+.assistant-upgrade-button {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 11px;
+  padding: 11px 15px;
+  border: 1px solid rgba(184, 150, 255, 0.3);
+  border-radius: 13px;
+  background: linear-gradient(135deg, #9c73ff, #7040e8);
+  box-shadow: 0 10px 24px rgba(112, 64, 232, 0.25);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.assistant-upgrade-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 13px 28px rgba(112, 64, 232, 0.34);
+}
+
+.assistant-upgrade-button svg {
+  transform: rotate(45deg);
+}
