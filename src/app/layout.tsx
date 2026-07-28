@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { MetaPixel } from "@/components/MetaPixel";
 
 export const metadata: Metadata = {
   title: "Soraia",
@@ -20,6 +21,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col" style={{ fontFamily: "'Nunito', sans-serif" }}>
+        <MetaPixel />
         {children}
       </body>
     </html>
