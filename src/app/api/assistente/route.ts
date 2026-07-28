@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import { processarMensagem } from "@/lib/soraia/engine";
+import { obterAcessoSoraia } from "@/lib/assinatura/acesso";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -52,6 +53,55 @@ export async function POST(request: Request) {
         },
         { status: 401 },
       );
+    }
+
+    const acesso = await obterAcessoSoraia({
+      supabase,
+      userId: user.id,
+    });
+
+    if (!acesso.proAtivo) {
+      const { data: consumo, error: erroConsumo } =
+        await supabase.rpc("consumir_mensagem_free");
+
+      if (erroConsumo) {
+        console.error(
+          "Erro ao consumir limite mensal:",
+          erroConsumo,
+        );
+
+        return NextResponse.json(
+          {
+            error:
+              "Não foi possível verificar seu limite mensal.",
+          },
+          { status: 500 },
+        );
+      }
+
+      const resultadoConsumo = Array.isArray(consumo)
+        ? consumo[0]
+        : consumo;
+
+      if (!resultadoConsumo?.permitido) {
+        return NextResponse.json(
+          {
+            error:
+              "Você atingiu o limite de 10 mensagens mensais do plano Free.",
+            resposta:
+              "Você atingiu o limite de 10 mensagens mensais do plano Free. Assine o Soraia Pro para continuar conversando.",
+            codigo: "LIMITE_FREE_ATINGIDO",
+            utilizadas: Number(
+              resultadoConsumo?.utilizadas ?? 10,
+            ),
+            limite: Number(
+              resultadoConsumo?.limite ?? 10,
+            ),
+            plano: "free",
+          },
+          { status: 429 },
+        );
+      }
     }
 
     const resultado = await processarMensagem({
