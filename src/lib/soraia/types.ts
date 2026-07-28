@@ -52,6 +52,7 @@ export type ProcessarMensagemParams = {
   userId: string;
   origem: OrigemMensagem;
   supabase: SupabaseClient;
+  podeExecutarAcoes: boolean;
   historico?: MensagemHistorico[];
 };
 

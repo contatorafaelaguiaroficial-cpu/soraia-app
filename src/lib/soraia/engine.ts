@@ -267,6 +267,7 @@ export async function processarMensagem(
     userId,
     origem,
     supabase,
+    podeExecutarAcoes,
     historico = [],
   } = params;
 
@@ -335,6 +336,24 @@ export async function processarMensagem(
     apiKey: process.env.OPENAI_API_KEY,
   });
 
+  const regraDoPlano = podeExecutarAcoes
+    ? `
+PLANO SORAIA PRO:
+- O usuário pode registrar receitas e despesas pelo chat.
+- O usuário pode criar metas e adicionar aportes pelo chat.
+- Execute as ferramentas quando o pedido atender às regras abaixo.
+`
+    : `
+REGRA DO PLANO FREE — PRIORIDADE MÁXIMA:
+- O usuário pode consultar e analisar suas finanças e metas.
+- Não registre receitas ou despesas pelo chat.
+- Não crie metas e não adicione aportes pelo chat.
+- Nunca diga que uma movimentação, meta ou aporte foi salvo.
+- Quando o usuário pedir uma dessas ações, explique de forma curta que a criação pelo chat é exclusiva do Soraia Pro.
+- Oriente que ele pode cadastrar manualmente no aplicativo ou assinar o Soraia Pro.
+- Esta regra tem prioridade sobre todas as instruções de registro e criação abaixo.
+`;
+
   const primeiraResposta =
     await openai.responses.create({
       model: "gpt-5-mini",
@@ -344,6 +363,8 @@ Você é a Soraia, uma assistente financeira pessoal brasileira inteligente, obj
 
 Data atual no Brasil: ${hoje}.
 Origem desta mensagem: ${origem}.
+
+${regraDoPlano}
 
 Sua principal função é interpretar linguagem natural, analisar as finanças do usuário e registrar receitas e despesas sem fazer perguntas desnecessárias.
 
@@ -487,8 +508,12 @@ Não invente valores ou insights diferentes dos dados fornecidos.
           content: texto,
         },
       ] as OpenAI.Responses.ResponseInput,
-      tools,
-      tool_choice: "auto",
+      ...(podeExecutarAcoes
+        ? {
+            tools,
+            tool_choice: "auto" as const,
+          }
+        : {}),
     });
 
   const chamadas = primeiraResposta.output.filter(
@@ -513,6 +538,14 @@ Não invente valores ou insights diferentes dos dados fornecidos.
 
   for (const chamada of chamadas) {
     if (chamada.type !== "function_call") {
+      continue;
+    }
+
+    if (!podeExecutarAcoes) {
+      console.warn(
+        "AÇÃO_BLOQUEADA_PLANO_FREE",
+        chamada.name,
+      );
       continue;
     }
 

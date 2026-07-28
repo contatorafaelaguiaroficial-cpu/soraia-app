@@ -109,6 +109,7 @@ export async function POST(request: Request) {
       userId: user.id,
       origem: "app_texto",
       supabase,
+      podeExecutarAcoes: acesso.proAtivo,
       historico,
     });
 
