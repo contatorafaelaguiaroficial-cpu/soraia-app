@@ -98,6 +98,42 @@ export const PIcon = {
       <circle cx="12" cy="12" r="1.5" fill={color} />
     </svg>
   ),
+  Cart: ({ color = pc.gold }: { color?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M3 4H5.2L7.6 15.2A2 2 0 0 0 9.55 16.8H18A2 2 0 0 0 19.9 15.3L21.5 8.2H6.2"
+        stroke={color}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="10" cy="20" r="1.4" fill={color} />
+      <circle cx="17.5" cy="20" r="1.4" fill={color} />
+    </svg>
+  ),
+  Message: ({ color = pc.purple }: { color?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M4 5.5A2 2 0 0 1 6 3.5H18A2 2 0 0 1 20 5.5V14A2 2 0 0 1 18 16H10L5.5 19.5V16H6A2 2 0 0 1 4 14V5.5Z"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M8 8.5H16M8 11.5H13" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  ),
+  TrendUp: ({ color = pc.whatsapp }: { color?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M3 16L9.5 9.5L14 14L21 6.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15 6.5H21V12.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  TrendDown: ({ color = "#e39b9b" }: { color?: string }) => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M3 8L9.5 14.5L14 10L21 17.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15 17.5H21V11.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
   Check: ({ color = pc.whatsapp }: { color?: string }) => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <path d="M3 8.5L6.2 11.5L13 4.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
