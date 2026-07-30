@@ -2,9 +2,11 @@ import { loadFont as loadArchivoBlack } from "@remotion/google-fonts/ArchivoBlac
 import { loadFont as loadInter } from "@remotion/google-fonts/Inter";
 import { loadFont as loadManrope } from "@remotion/google-fonts/Manrope";
 import { loadFont as loadFraunces } from "@remotion/google-fonts/Fraunces";
+import { loadFont as loadBebasNeue } from "@remotion/google-fonts/BebasNeue";
 
 const { fontFamily: headlineFont } = loadArchivoBlack();
 const { fontFamily: bodyFont } = loadInter();
+const { fontFamily: bebasFont } = loadBebasNeue();
 const { fontFamily: manropeFont } = loadManrope("normal", {
   weights: ["500", "700", "800"],
   subsets: ["latin"],
@@ -20,4 +22,6 @@ export const fonts = {
   // premium pairing used by the static ad: grotesk + editorial serif accent
   grotesk: manropeFont,
   serif: frauncesFont,
+  // ultra-condensed poster display, used by the Pro sales ad
+  condensed: bebasFont,
 };

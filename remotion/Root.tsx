@@ -3,6 +3,7 @@ import { Creative } from "./Creative";
 import { StaticAd } from "./StaticAd";
 import { PremiumFilm } from "./PremiumFilm";
 import { SpeedFilm } from "./SpeedFilm";
+import { ProAd } from "./ProAd";
 
 export const FPS = 30;
 export const DURATION_IN_FRAMES = 702; // ~23.4s
@@ -33,6 +34,14 @@ export const Root: React.FC = () => {
         id="SoraiaSpeedFilm"
         component={SpeedFilm}
         durationInFrames={741}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+      />
+      <Composition
+        id="SoraiaProAd"
+        component={ProAd}
+        durationInFrames={330}
         fps={FPS}
         width={WIDTH}
         height={HEIGHT}
